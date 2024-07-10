@@ -23,12 +23,10 @@ jobs:
           node-version: "22"
       - name: Install dependencies
         run: npm ci
-      - name: Inject API URL
-        run: echo "REACT_APP_API_URL=${{ env.REACT_APP_API_URL }}" >> .env && echo ${{ env.REACT_APP_API_URL }}
       - name: Build project
         run: npm run build
         env:
-          REACT_APP_API_URL: ${{ env.REACT_APP_API_URL }}
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
