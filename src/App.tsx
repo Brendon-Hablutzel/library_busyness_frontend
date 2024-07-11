@@ -76,7 +76,8 @@ const LibraryComponent: React.FC<{
       return (
         <div className={className}>
           <h1 className="text-center">
-            Error fetching {formattedLibrary} data
+            Error fetching {formattedLibrary} data - if you are using an
+            adblocker, try disabling it
           </h1>
         </div>
       );
