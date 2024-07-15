@@ -19,14 +19,14 @@ export const Toggle: React.FC<{
         />
         <span
           className={`flex items-center rounded py-2 px-3 text-sm font-medium transition ${
-            !state ? "text-text-light bg-green-600" : "text-text-light"
+            !state ? "text-text-light bg-blue-600" : "text-text-light"
           }`}
         >
           {disabledText}
         </span>
         <span
           className={`flex items-center rounded py-2 px-3 text-sm font-medium transition ${
-            state ? "text-text-light bg-blue-600" : "text-text-light"
+            state ? "text-text-light bg-amber-600" : "text-text-light"
           }`}
         >
           {enabledText}

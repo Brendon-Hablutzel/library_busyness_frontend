@@ -1,16 +1,23 @@
-import { HillData, HuntData } from "./models";
+import { HillData, HillForecast, HuntData, HuntForecast } from "./utils/models";
 import {
   Area,
   CartesianGrid,
   ComposedChart,
   Line,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   TooltipProps,
   XAxis,
   YAxis,
 } from "recharts";
-import { capitalize, formatPercent, padOneZero } from "./utils";
+import {
+  capitalize,
+  formatPercent,
+  nMinutesAfter,
+  padOneZero,
+  reverse,
+} from "./utils";
 import {
   NameType,
   ValueType,
@@ -24,18 +31,35 @@ const formatTimestampFull = (epochTimestampMillis: number) => {
 
 const formatTimestampSimple = (epochTimestampMillis: number) => {
   const when = new Date(epochTimestampMillis);
-  return `${when.getMonth() + 1}/${when.getDate()} ${padOneZero(when.getHours())}:${padOneZero(when.getMinutes())}`;
+  const dayOfWeekName = when.toLocaleString("default", { weekday: "short" });
+  return `${dayOfWeekName} ${when.getMonth() + 1}/${when.getDate()} ${padOneZero(when.getHours())}:${padOneZero(when.getMinutes())}`;
 };
 
-const graphColors = ["#82acca", "#82ca9d", "#8884d8", "#ffc658", "#ca8282"];
+const graphColorsCounts = [
+  "#589dd6", // blues:
+  "#87CEEB",
+  "#1E90FF",
+  "#1ca9d9",
+];
 
-const getGraphColor = (idx: number): string => {
-  return graphColors[idx % graphColors.length];
+const graphColorsPercent = [
+  "#e3a02d", // soft orange
+];
+
+const getGraphColorCounts = (idx: number): string => {
+  return graphColorsCounts[idx % graphColorsCounts.length];
+};
+
+const getGraphColorPercent = (idx: number): string => {
+  return graphColorsPercent[idx % graphColorsPercent.length];
 };
 
 const formatSeriesName = (s: string) => {
   const components = s.split("_");
-  return capitalize(components[0]);
+  const capitalizedName = capitalize(components[0]);
+  return s.includes("forecast")
+    ? `${capitalizedName} (forecast)`
+    : capitalizedName;
 };
 
 const CustomTooltip: React.FC<TooltipProps<ValueType, NameType>> = ({
@@ -44,9 +68,13 @@ const CustomTooltip: React.FC<TooltipProps<ValueType, NameType>> = ({
   label,
 }: TooltipProps<ValueType, NameType>) => {
   if (active && payload && payload.length > 0) {
+    payload = reverse(payload);
     return (
       <div className="bg-bg-dark rounded-md p-2 bg-opacity-75">
         <h2 className="font-semibold">{formatTimestampFull(label)}</h2>
+        {/* TODO: this loop puts tooltip series labels in the reverse order
+        from what appears on the graph (bottommost series on the graph becomes topmost) 
+        on the tooltip*/}
         {payload.map((series, idx) => {
           const color = series.color
             ? `text-[${series.color}]`
@@ -77,17 +105,21 @@ interface BusynessAreaChartProps {
     | {
         library: "hill";
         records: HillData[];
+        forecasts: HillForecast[];
       }
     | {
         library: "hunt";
         records: HuntData[];
+        forecasts: HuntForecast[];
       };
   displayType: "count" | "percent";
+  now: Date;
 }
 
 export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
   recordOptions,
   displayType,
+  now,
 }) => {
   const records = recordOptions.records.map((record) => {
     const { record_datetime, ...rest } = record;
@@ -96,6 +128,26 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
       record_datetime: new Date(record_datetime),
     };
   });
+
+  const forecasts = recordOptions.forecasts.map((forecast) => {
+    const { record_datetime, total_count, total_percent, ...rest } = forecast;
+    return {
+      ...rest,
+      total_count_forecast: total_count,
+      total_percent_forecast: total_percent,
+      record_datetime: new Date(record_datetime),
+    };
+  });
+
+  const data: {
+    library: string;
+    record_datetime: Date;
+    total_count?: number;
+    total_percent?: number;
+    total_count_forecast?: number;
+    total_percent_forecast?: number;
+  }[] = [...records, ...forecasts];
+
   const library = recordOptions.library;
 
   const hillFields = ["east", "tower", "west"];
@@ -104,17 +156,18 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
   return (
     <ResponsiveContainer width="100%" height="100%">
       {/* margin is so that rotated ticks don't get cut off */}
-      <ComposedChart data={records} margin={{ bottom: 40 }}>
+      <ComposedChart data={data} margin={{ bottom: 60 }}>
         <Tooltip content={<CustomTooltip />} animationDuration={200} />
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
           dataKey="record_datetime"
           tick={{ fill: "#d4d4d4" }}
           tickFormatter={formatTimestampSimple}
-          angle={-35}
-          dx={-18}
+          tickMargin={15}
+          angle={-45}
+          dx={-30}
           dy={20}
-          minTickGap={30}
+          minTickGap={35}
           // this ensures that spacing between data points is proportional
           // to the duration between those data points
           scale={scaleTime()}
@@ -138,9 +191,9 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
                   type="monotone"
                   dataKey={`${area}_count`}
                   key={idx}
-                  // save idx = 0 graph color for total percent
-                  fill={getGraphColor(idx + 1)}
-                  stroke={getGraphColor(idx + 1)}
+                  fill={getGraphColorCounts(idx + 1)}
+                  stroke={getGraphColorCounts(idx + 1)}
+                  fillOpacity={0.7}
                   stackId="1"
                   animationDuration={500}
                 />
@@ -153,8 +206,9 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
                   type="monotone"
                   dataKey={`${area}_count`}
                   key={idx}
-                  fill={getGraphColor(idx + 1)}
-                  stroke={getGraphColor(idx + 1)}
+                  fill={getGraphColorCounts(idx + 1)}
+                  stroke={getGraphColorCounts(idx + 1)}
+                  fillOpacity={0.7}
                   stackId="1"
                   animationDuration={500}
                 />
@@ -167,21 +221,50 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
         {displayType === "percent" ? (
           <Area
             type="monotone"
-            dataKey={`total_percent`}
-            fill={getGraphColor(0)}
-            stroke={getGraphColor(0)}
+            dataKey="total_percent"
+            fill={getGraphColorPercent(1)}
+            stroke={getGraphColorPercent(1)}
+            fillOpacity={0.7}
             animationDuration={500}
           />
         ) : (
+          // this transparent total line is just here so that the
+          // tooltip shows total count
           <Line
             type="monotone"
-            dataKey={`total_count`}
+            dataKey="total_count"
             stroke="#ffffff"
             strokeOpacity={0}
             dot={false}
             animationDuration={500}
           />
         )}
+        {displayType === "count" ? (
+          <Area
+            type="monotone"
+            dataKey="total_count_forecast"
+            fill={getGraphColorCounts(0)}
+            stroke={getGraphColorCounts(0)}
+            animationDuration={500}
+            fillOpacity={0.3}
+          />
+        ) : (
+          <Area
+            type="monotone"
+            dataKey="total_percent_forecast"
+            fill={getGraphColorPercent(0)}
+            stroke={getGraphColorPercent(0)}
+            animationDuration={500}
+            fillOpacity={0.3}
+          />
+        )}
+        <ReferenceLine
+          // place the reference line just ahead of the current time (7 mins)
+          // to fill the gap between last record and first forecast
+          x={nMinutesAfter(now, 7).valueOf()}
+          stroke="#fc0303"
+          strokeWidth={1.5}
+        />
       </ComposedChart>
     </ResponsiveContainer>
   );

@@ -27,3 +27,17 @@ export interface HuntData {
   level5_count: number;
   level5_percent: number;
 }
+
+export interface HillForecast {
+  library: "hill#prediction";
+  record_datetime: number;
+  total_count: number;
+  total_percent: number;
+}
+
+export interface HuntForecast {
+  library: "hunt#prediction";
+  record_datetime: number;
+  total_count: number;
+  total_percent: number;
+}

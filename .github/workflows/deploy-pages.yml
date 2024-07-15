@@ -26,7 +26,8 @@ jobs:
       - name: Build project
         run: npm run build
         env:
-          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+          REACT_APP_HISTORICAL_RECORDS_API_URL: ${{ secrets.REACT_APP_HISTORICAL_RECORDS_API_URL }}
+          REACT_APP_FORECASTS_API_URL: ${{ secrets.REACT_APP_FORECASTS_API_URL }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:

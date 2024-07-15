@@ -1,3 +1,13 @@
+export const reverse = <T>(arr: T[]): T[] => {
+  const reversedArr = [];
+
+  for (let i = arr.length - 1; i >= 0; i--) {
+    reversedArr.push(arr[i]);
+  }
+
+  return reversedArr;
+};
+
 export const maxByFn = <T>(
   arr: T[],
   fn: (item: T) => number
@@ -13,23 +23,23 @@ export const maxByFn = <T>(
   return max;
 };
 
-export const getNLargestByFn = <T>(
-  arr: T[],
-  fn: (item: T) => number,
-  n: number
-): T[] => {
-  if (n <= 0) {
-    return [];
-  }
+// export const getNLargestByFn = <T>(
+//   arr: T[],
+//   fn: (item: T) => number,
+//   n: number
+// ): T[] => {
+//   if (n <= 0) {
+//     return [];
+//   }
 
-  const ascendingArr = arr.sort((a, b) => fn(a) - fn(b));
+//   const ascendingArr = arr.sort((a, b) => fn(a) - fn(b));
 
-  if (n >= ascendingArr.length) {
-    return ascendingArr;
-  }
+//   if (n >= ascendingArr.length) {
+//     return ascendingArr;
+//   }
 
-  return ascendingArr.slice(-n);
-};
+//   return ascendingArr.slice(-n);
+// };
 
 export const getLargerThanByFn = <T>(
   arr: T[],
@@ -47,16 +57,20 @@ export const padOneZero = (n: number): string => {
   }
 };
 
-export const oneHourBefore = (when: Date) => {
-  return new Date(when.valueOf() - 1000 * 60 * 60);
+export const nHoursBefore = (when: Date, nHours: number): Date => {
+  return new Date(when.valueOf() - 1000 * 60 * 60 * nHours);
 };
 
-export const oneDayBefore = (when: Date) => {
-  return new Date(when.valueOf() - 1000 * 60 * 60 * 24);
+export const nDaysBefore = (when: Date, nDays: number): Date => {
+  return new Date(when.valueOf() - 1000 * 60 * 60 * 24 * nDays);
 };
 
-export const oneWeekBefore = (when: Date) => {
-  return new Date(when.valueOf() - 1000 * 60 * 60 * 24 * 7);
+export const nHoursAfter = (when: Date, nHours: number): Date => {
+  return new Date(when.valueOf() + 1000 * 60 * 60 * nHours);
+};
+
+export const nMinutesAfter = (when: Date, nMinutes: number): Date => {
+  return new Date(when.valueOf() + 1000 * 60 * nMinutes);
 };
 
 export const capitalize = (s: string) => {
@@ -70,7 +84,7 @@ export const capitalize = (s: string) => {
   return `${firstLetter.toUpperCase()}${rest.toLowerCase()}`;
 };
 
-export const getClosestTo = <T>(
+export const getNearestItemByFn = <T>(
   arr: T[],
   fn: (item: T) => number,
   target: number

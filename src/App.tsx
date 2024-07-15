@@ -1,50 +1,22 @@
 import { useEffect, useState } from "react";
-import { HillData, HuntData } from "./models";
+import { HillData, HillForecast, HuntData, HuntForecast } from "./utils/models";
+import {
+  fetchHillRecords,
+  fetchHuntRecords,
+  HillDataResponse,
+  HuntDataResponse,
+} from "./utils/backend";
 import { BusynessAreaChart } from "./Charts";
 import {
   capitalize,
   formatPercent,
-  getClosestTo,
-  maxByFn,
-  oneDayBefore,
-  oneHourBefore,
-  oneWeekBefore,
+  getNearestItemByFn,
+  nDaysBefore,
+  nHoursAfter,
 } from "./utils";
 import { Toggle } from "./Toggle";
 
-const API_URL = process.env.REACT_APP_API_URL;
-
-const getUrl = (library: "hill" | "hunt", since?: number): string => {
-  if (!API_URL) {
-    console.error("REACT_APP_API_URL environment variable is not defined");
-  }
-
-  return `${API_URL}/?library=${library}${since ? `&since=${since}` : ""}`;
-};
-
-type BusynessDataResponse<T extends HillData | HuntData> =
-  | {
-      status: "loading";
-    }
-  | {
-      status: "loaded-error";
-      error: unknown;
-    }
-  | {
-      status: "loaded-found";
-      records: T[];
-      mostRecentRecord: T;
-      fetchedAt: Date;
-    }
-  | {
-      status: "loaded-notfound";
-    };
-
-type HillDataResponse = BusynessDataResponse<HillData>;
-
-type HuntDataResponse = BusynessDataResponse<HuntData>;
-
-const LibraryComponent: React.FC<{
+interface LibraryComponentProps {
   data:
     | {
         library: "hill";
@@ -56,7 +28,13 @@ const LibraryComponent: React.FC<{
       };
   className: string;
   now: Date;
-}> = ({ data, className, now }) => {
+}
+
+const LibraryComponent: React.FC<LibraryComponentProps> = ({
+  data,
+  className,
+  now,
+}) => {
   const { library, dataResponse } = data;
   const formattedLibrary = capitalize(library);
 
@@ -68,14 +46,16 @@ const LibraryComponent: React.FC<{
     case "loading": {
       return (
         <div className={className}>
-          <h1 className="text-center">Fetching {formattedLibrary} data...</h1>
+          <h1 className="text-center p-5">
+            Fetching {formattedLibrary} data...
+          </h1>
         </div>
       );
     }
     case "loaded-error": {
       return (
         <div className={className}>
-          <h1 className="text-center">
+          <h1 className="text-center p-5">
             Error fetching {formattedLibrary} data - if you are using an
             adblocker, try disabling it
           </h1>
@@ -83,30 +63,36 @@ const LibraryComponent: React.FC<{
       );
     }
     case "loaded-found": {
-      const { records, mostRecentRecord, fetchedAt } = dataResponse;
-      const oneHourAgo = oneHourBefore(now);
-      const oneDayAgo = oneDayBefore(now);
+      const { records, mostRecentRecord, forecasts } = dataResponse;
 
-      const hourAgoRecord = getClosestTo<{
-        record_datetime: number;
-        total_count: number;
-      }>(records, (item) => item.record_datetime, oneHourAgo.valueOf());
+      const mostRecentCount = mostRecentRecord.total_count;
+      const mostRecentPercent = mostRecentRecord.total_percent;
 
-      const lastHourPercentChange =
-        hourAgoRecord !== undefined
-          ? (mostRecentRecord.total_count - hourAgoRecord.total_count) /
-            hourAgoRecord.total_count
+      const hourAheadRecord = getNearestItemByFn<HillForecast | HuntForecast>(
+        forecasts,
+        (item) => item.record_datetime,
+        nHoursAfter(now, 1).valueOf()
+      );
+      const hourAheadCount =
+        hourAheadRecord !== undefined ? hourAheadRecord.total_count : undefined;
+
+      const nextHourPercentChange =
+        hourAheadCount !== undefined
+          ? (hourAheadCount - mostRecentCount) / mostRecentCount
           : undefined;
 
-      const dayAgoRecord = getClosestTo<{
-        record_datetime: number;
-        total_count: number;
-      }>(records, (item) => item.record_datetime, oneDayAgo.valueOf());
+      const oneDayAgo = nDaysBefore(now, 1);
+      const dayAgoRecord = getNearestItemByFn<HillData | HuntData>(
+        records,
+        (item) => item.record_datetime,
+        oneDayAgo.valueOf()
+      );
+      const dayAgoCount =
+        dayAgoRecord !== undefined ? dayAgoRecord.total_count : undefined;
 
       const lastDayPercentChange =
-        dayAgoRecord !== undefined
-          ? (mostRecentRecord.total_count - dayAgoRecord.total_count) /
-            dayAgoRecord.total_count
+        dayAgoCount !== undefined
+          ? (mostRecentCount - dayAgoCount) / dayAgoCount
           : undefined;
 
       return (
@@ -118,37 +104,36 @@ const LibraryComponent: React.FC<{
             <div className="lg:flex lg:justify-between">
               <div className="flex justify-between lg:block">
                 <h3 className="text-3xl md:text-4xl lg:text-3xl xl:text-3xl 2xl:text-4xl">
-                  <span className="font-semibold">
-                    {mostRecentRecord.total_count}
-                  </span>{" "}
+                  <span className="font-semibold">{mostRecentCount}</span>{" "}
                   people
                 </h3>
                 <h3 className="text-3xl md:text-4xl lg:text-2xl xl:text-2xl 2xl:text-3xl">
                   <span className="font-semibold">
-                    {formatPercent(mostRecentRecord.total_percent)}
+                    {formatPercent(mostRecentPercent)}
                   </span>{" "}
                   full
                 </h3>
               </div>
               <div className="lg:text-right">
-                {lastHourPercentChange === undefined ||
-                Math.abs(Math.round(lastHourPercentChange * 100)) === 0 ? (
+                {nextHourPercentChange === undefined ||
+                Math.round(nextHourPercentChange * 100) === 0 ? (
                   <div className="text-lg md:text-2xl lg:text-3xl xl:text-3xl 2xl:text-4xl">
-                    no change in busyness over the past hour
+                    busyness not expected to change over the next hour
                   </div>
                 ) : (
                   <div className="text-lg md:text-2xl lg:text-3xl xl:text-3xl 2xl:text-4xl">
-                    busyness {lastHourPercentChange > 0 ? "up" : "down"} by{" "}
+                    busyness expected to go{" "}
+                    {nextHourPercentChange > 0 ? "up" : "down"} by{" "}
                     <span
-                      className={`${lastHourPercentChange > 0 ? "text-red-500" : "text-green-500"} font-semibold`}
+                      className={`${nextHourPercentChange > 0 ? "text-red-500" : "text-green-500"} font-semibold`}
                     >
-                      {formatPercent(lastHourPercentChange, true)}
+                      {formatPercent(nextHourPercentChange, true)}
                     </span>{" "}
-                    over the past hour
+                    over the next hour
                   </div>
                 )}
                 {lastDayPercentChange === undefined ||
-                Math.abs(Math.round(lastDayPercentChange * 100)) === 0 ? (
+                Math.round(lastDayPercentChange * 100) === 0 ? (
                   <div className="text-md md:text-xl lg:text-2xl xl:text-2xl 2xl:text-3xl">
                     no change in busyness compared to this time yesterday
                   </div>
@@ -167,17 +152,26 @@ const LibraryComponent: React.FC<{
               </div>
             </div>
           </div>
-          {/* 98vw is a hack because responsive container seems to always make its parent
+          {/* 98vw is a hack because responsive container at 100vw makes its parent
           element overflow */}
-          <div className="flex justify-center w-[98vw] h-[40vh]">
+          <div className="flex justify-center w-[98vw] h-[35vh] lg:h-[50vh]">
             <BusynessAreaChart
               // type assertion is valid because of LibraryComponent props
               recordOptions={
-                { library, records } as
-                  | { library: "hill"; records: HillData[] }
-                  | { library: "hunt"; records: HuntData[] }
+                { library, records, forecasts } as
+                  | {
+                      library: "hill";
+                      records: HillData[];
+                      forecasts: HillForecast[];
+                    }
+                  | {
+                      library: "hunt";
+                      records: HuntData[];
+                      forecasts: HuntForecast[];
+                    }
               }
               displayType={displayType ? "percent" : "count"}
+              now={now}
             />
           </div>
           <div className="min-h-[3vh] p-5 xl:px-10 flex justify-between">
@@ -191,19 +185,18 @@ const LibraryComponent: React.FC<{
                 setState={setDisplayType}
               />
             </div>
-            <div className="text-right">
-              Last checked for {formattedLibrary} updates at{" "}
-              {fetchedAt.toLocaleString()}
-            </div>
+            {/* <div className="text-right">
+              Last checked {formattedLibrary} busyness at {at.toLocaleString()}
+            </div> */}
           </div>
-          {/* TODO: option to show areas */}
+          {/* TODO: option to show areas? */}
         </div>
       );
     }
     case "loaded-notfound": {
       return (
         <div className={className}>
-          <h1 className="text-center">No {formattedLibrary} data found</h1>
+          <h1 className="text-center p-5">No {formattedLibrary} data found</h1>
         </div>
       );
     }
@@ -238,37 +231,9 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      try {
-        const result = await fetch(
-          getUrl("hill", oneWeekBefore(now).valueOf())
-        );
-        const parsed = await result.json();
-        const records = parsed.busynessRecords as HillData[];
+      const hillDataResponse = await fetchHillRecords(nDaysBefore(now, 4));
 
-        if (records.length > 0) {
-          // must exist because there is at least one record
-          const mostRecentRecord = maxByFn(
-            records,
-            (item) => item.record_datetime
-          ) as HillData;
-
-          setHillDataResponse({
-            status: "loaded-found",
-            records,
-            mostRecentRecord,
-            fetchedAt: now,
-          });
-        } else {
-          setHillDataResponse({
-            status: "loaded-notfound",
-          });
-        }
-      } catch (e) {
-        setHillDataResponse({
-          status: "loaded-error",
-          error: e,
-        });
-      }
+      setHillDataResponse(hillDataResponse);
     })();
   }, [now]);
 
@@ -278,58 +243,38 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      try {
-        const result = await fetch(
-          getUrl("hunt", oneWeekBefore(now).valueOf())
-        );
-        const parsed = await result.json();
-        const records = parsed.busynessRecords as HuntData[];
+      const huntDataResponse = await fetchHuntRecords(nDaysBefore(now, 4));
 
-        if (records.length > 0) {
-          // must exist because there is at least one record
-          const mostRecentRecord = maxByFn(
-            records,
-            (item) => item.record_datetime
-          ) as HuntData;
-
-          setHuntDataResponse({
-            status: "loaded-found",
-            records,
-            mostRecentRecord,
-            fetchedAt: now,
-          });
-        } else {
-          setHuntDataResponse({
-            status: "loaded-notfound",
-          });
-        }
-      } catch (e) {
-        setHuntDataResponse({
-          status: "loaded-error",
-          error: e,
-        });
-      }
+      setHuntDataResponse(huntDataResponse);
     })();
   }, [now]);
 
   return (
     <>
       <div className="min-h-[10vh] max-w-[100vw] flex justify-center items-center bg-bg-darkest text-text-light">
-        <h1 className="p-5 text-4xl md:text-6xl lg:text-6xl xl:text-6xl 2xl:text-7xl text-center">
+        <h1 className="p-5 pb-0 text-3xl md:text-6xl lg:text-6xl xl:text-6xl 2xl:text-7xl text-center">
           NCSU Library Busyness
         </h1>
       </div>
       <LibraryComponent
-        data={{ library: "hill", dataResponse: hillDataResponse }}
+        data={{
+          library: "hill",
+          dataResponse: hillDataResponse,
+        }}
         now={now}
         className="max-w-[100vw] min-h-[55vh] bg-bg-darkest text-text-light"
       />
       <LibraryComponent
-        data={{ library: "hunt", dataResponse: huntDataResponse }}
+        data={{
+          library: "hunt",
+          dataResponse: huntDataResponse,
+        }}
         now={now}
         className="max-w-[100vw] min-h-[55vh] bg-bg-darkest text-text-light"
       />
-      <div className="h-[5vh] bg-bg-darkest"></div>
+      <div className="h-[10vh] bg-bg-darkest text-text-light text-center text-sm sm:text-lg md:text-xl">
+        Last checked for new data at {now.toLocaleString()}
+      </div>
     </>
   );
 };
