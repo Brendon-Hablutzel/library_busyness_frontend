@@ -156,7 +156,7 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
   return (
     <ResponsiveContainer width="100%" height="100%">
       {/* margin is so that rotated ticks don't get cut off */}
-      <ComposedChart data={data} margin={{ bottom: 60 }}>
+      <ComposedChart data={data} margin={{ bottom: 60, left: 8 }}>
         <Tooltip content={<CustomTooltip />} animationDuration={200} />
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
