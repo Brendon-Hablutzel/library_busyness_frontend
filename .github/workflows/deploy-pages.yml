@@ -29,10 +29,9 @@ jobs:
           REACT_APP_HISTORICAL_RECORDS_API_URL: ${{ secrets.REACT_APP_HISTORICAL_RECORDS_API_URL }}
           REACT_APP_FORECASTS_API_URL: ${{ secrets.REACT_APP_FORECASTS_API_URL }}
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
-  # Deployment job
   deploy:
     environment:
       name: github-pages
@@ -42,4 +41,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v3
+        uses: actions/deploy-pages@v4
