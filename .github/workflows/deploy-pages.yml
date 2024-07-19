@@ -29,7 +29,7 @@ jobs:
           REACT_APP_HISTORICAL_RECORDS_API_URL: ${{ secrets.REACT_APP_HISTORICAL_RECORDS_API_URL }}
           REACT_APP_FORECASTS_API_URL: ${{ secrets.REACT_APP_FORECASTS_API_URL }}
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
+        uses: actions/upload-pages-artifact@v4
         with:
           path: ./dist
   # Deployment job
