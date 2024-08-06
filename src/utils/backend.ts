@@ -1,5 +1,11 @@
 import { maxByFn } from ".";
-import { HillData, HillForecast, HuntData, HuntForecast } from "./models";
+import {
+  HillData,
+  HillForecast,
+  HuntData,
+  HuntForecast,
+  LibraryForecastMetrics,
+} from "./models";
 
 const HISTORICAL_RECORDS_API_URL =
   process.env.REACT_APP_HISTORICAL_RECORDS_API_URL;
@@ -131,6 +137,42 @@ export const fetchHuntRecords = async (
   } catch (e) {
     return {
       status: "loaded-error",
+      error: e,
+    };
+  }
+};
+
+export type MetricsApiResponse =
+  | {
+      status: "loading";
+    }
+  | {
+      status: "error";
+      error: unknown;
+    }
+  | {
+      status: "success";
+      metrics: LibraryForecastMetrics[];
+    };
+
+// TODO: since parameter
+export const fetchMetrics = async (
+  since: Date
+): Promise<MetricsApiResponse> => {
+  try {
+    const result = await fetch(
+      `https://d3fctlkfp6uftbecyg6r7jccwu0nauzt.lambda-url.us-east-1.on.aws?since=${since.valueOf()}`
+    );
+    const parsedResult = await result.json();
+    const metrics = parsedResult.metrics as LibraryForecastMetrics[];
+
+    return {
+      status: "success",
+      metrics,
+    };
+  } catch (e) {
+    return {
+      status: "error",
       error: e,
     };
   }

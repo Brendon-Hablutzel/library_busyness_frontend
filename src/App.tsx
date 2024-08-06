@@ -6,7 +6,7 @@ import {
   HillDataResponse,
   HuntDataResponse,
 } from "./utils/backend";
-import { BusynessAreaChart } from "./Charts";
+import { BusynessAreaChart /*ForecastMetricsChart*/ } from "./Charts";
 import {
   capitalize,
   formatPercent,
@@ -15,6 +15,7 @@ import {
   nHoursAfter,
 } from "./utils";
 import { Toggle } from "./Toggle";
+import { MetricsComponent } from "./Metrics";
 
 interface LibraryComponentProps {
   data:
@@ -275,6 +276,11 @@ export const App: React.FC = () => {
       <div className="h-[10vh] bg-bg-darkest text-text-light text-center text-sm sm:text-lg md:text-xl">
         Last checked for new data at {now.toLocaleString()}
       </div>
+      <hr className="pb-10 bg-bg-darkest" />
+      {/* <div className="flex justify-center w-[98vw] h-[35vh] lg:h-[50vh]">
+        <ForecastMetricsChart />
+      </div> */}
+      <MetricsComponent className="min-h-[10vh] bg-bg-darkest text-text-light" />
     </>
   );
 };

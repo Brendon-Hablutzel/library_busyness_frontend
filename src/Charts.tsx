@@ -1,6 +1,7 @@
 import { HillData, HillForecast, HuntData, HuntForecast } from "./utils/models";
 import {
   Area,
+  Brush,
   CartesianGrid,
   ComposedChart,
   Line,
@@ -265,6 +266,73 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
           stroke="#fc0303"
           strokeWidth={1.5}
         />
+        {/* <Brush startIndex={100} /> */}
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+};
+
+// type PairedRecord = {
+//   // "record_datetime": number,
+//   actual_total_percent: number;
+//   predicted_total_percent: number;
+//   actual_total_count: number;
+//   predicted_total_count: number;
+// };
+
+export interface ForecastMetricsChartProps {
+  records: {
+    record_datetime: number;
+    total_count_actual: number;
+    total_count_predicted: number;
+  }[];
+}
+
+export const ForecastMetricsChart: React.FC<ForecastMetricsChartProps> = ({
+  records,
+}) => {
+  if (records.length === 0) {
+    return <div>loading metrics</div>;
+  }
+
+  const parsedRecords = records.map((record) => {
+    const { record_datetime, ...rest } = record;
+    return {
+      ...rest,
+      record_datetime: new Date(record_datetime),
+    };
+  });
+
+  return (
+    <ResponsiveContainer width="100%" height="100%">
+      {/* margin is so that rotated ticks don't get cut off */}
+      <ComposedChart data={parsedRecords} margin={{ left: 8 }}>
+        <Tooltip animationDuration={200} />
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis
+          dataKey="record_datetime"
+          tick={{ fill: "#d4d4d4" }}
+          tickFormatter={formatTimestampSimple}
+          tickMargin={15}
+          angle={-45}
+          dx={-30}
+          dy={25}
+          minTickGap={35}
+          // this ensures that spacing between data points is proportional
+          // to the duration between those data points
+          scale={scaleTime()}
+          height={105}
+        />
+        <YAxis tick={{ fill: "#d4d4d4" }} />
+        <Area dataKey="total_count_actual" animationDuration={500} />
+        <Line
+          dataKey="total_count_predicted"
+          animationDuration={500}
+          dot={false}
+          stroke="#00d636"
+          strokeWidth={2}
+        />
+        <Brush travellerWidth={10} gap={5} height={25} />
       </ComposedChart>
     </ResponsiveContainer>
   );

@@ -41,3 +41,20 @@ export interface HuntForecast {
   total_count: number;
   total_percent: number;
 }
+
+export type BasicMetrics = {
+  numForecastRecords: number;
+  averagePercentError: number;
+  meanAbsoluteError: number;
+};
+
+export type LibraryForecastMetrics = {
+  library: "hill" | "hunt";
+  overall: BasicMetrics;
+  daytime: BasicMetrics;
+  records: {
+    record_datetime: number;
+    total_count_actual: number;
+    total_count_predicted: number;
+  }[];
+};

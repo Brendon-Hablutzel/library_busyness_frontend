@@ -57,6 +57,10 @@ export const padOneZero = (n: number): string => {
   }
 };
 
+export const nWeeksBefore = (when: Date, nWeeks: number): Date => {
+  return new Date(when.valueOf() - 1000 * 60 * 60 * 24 * 7 * nWeeks);
+};
+
 export const nHoursBefore = (when: Date, nHours: number): Date => {
   return new Date(when.valueOf() - 1000 * 60 * 60 * nHours);
 };
