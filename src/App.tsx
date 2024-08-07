@@ -46,11 +46,11 @@ const LibraryComponent: React.FC<LibraryComponentProps> = ({
     case "loading": {
       return (
         <div className={className}>
-          <div className="bg-bg-dark rounded-lg p-2 shadow-maincard">
+          <div className="bg-bg-dark rounded-lg shadow-maincard p-2 md:p-4 lg:p-5">
             <h1 className="text-4xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-6xl font-bold mb-1">
               {formattedLibrary}
             </h1>
-            <h2 className="text-xl">Loading data, please wait...</h2>
+            <h2 className="text-2xl">Loading data, please wait...</h2>
           </div>
         </div>
       );
@@ -58,11 +58,11 @@ const LibraryComponent: React.FC<LibraryComponentProps> = ({
     case "loaded-error": {
       return (
         <div className={className}>
-          <div className="bg-bg-dark rounded-lg p-2 shadow-maincard">
+          <div className="bg-bg-dark rounded-lg shadow-maincard p-2 md:p-4 lg:p-5">
             <h1 className="text-4xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-6xl font-bold mb-1">
               {formattedLibrary}
             </h1>
-            <h2 className="text-xl text-red-500">
+            <h2 className="text-2xl text-red-500">
               Sorry, there was an error loading occupancy data. Please try
               again.
             </h2>
@@ -109,7 +109,7 @@ const LibraryComponent: React.FC<LibraryComponentProps> = ({
 
       return (
         <div className={className}>
-          <div className="bg-bg-dark rounded-lg p-2 md:p-4 shadow-maincard lg:p-5">
+          <div className="bg-bg-dark rounded-lg shadow-maincard p-2 md:p-4 lg:p-5">
             <div className="mb-2">
               <h2 className="text-4xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-6xl font-bold mb-1">
                 {formattedLibrary}
@@ -201,11 +201,11 @@ const LibraryComponent: React.FC<LibraryComponentProps> = ({
     case "loaded-notfound": {
       return (
         <div className={className}>
-          <div className="bg-bg-dark rounded-lg p-2 shadow-maincard">
+          <div className="bg-bg-dark rounded-lg shadow-maincard p-2 md:p-4 lg:p-5">
             <h1 className="text-4xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-6xl font-bold mb-1">
               {formattedLibrary}
             </h1>
-            <h2 className="text-xl">No data found, try again later.</h2>
+            <h2 className="text-2xl">No data found, try again later.</h2>
           </div>
         </div>
       );
