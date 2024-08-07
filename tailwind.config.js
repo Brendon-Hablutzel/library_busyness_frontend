@@ -11,6 +11,13 @@ export default {
         "text-light": "#d4d4d4",
         "text-highlight": "#9e0000",
       },
+      dropShadow: {
+        header: "0.05em 0.1em 0.07em rgb(0,0,0,0.5)",
+      },
+      boxShadow: {
+        // horiontal offset, vertical offset, blur radius, spread radius, color
+        maincard: "0.1em 0.3em 0.5em 0.3em rgb(0,0,0,0.25)",
+      },
     },
   },
   // these are for graph/tooltip colors because the tooltip

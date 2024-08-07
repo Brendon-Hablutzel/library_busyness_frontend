@@ -155,7 +155,6 @@ export type MetricsApiResponse =
       metrics: LibraryForecastMetrics[];
     };
 
-// TODO: since parameter
 export const fetchMetrics = async (
   since: Date
 ): Promise<MetricsApiResponse> => {

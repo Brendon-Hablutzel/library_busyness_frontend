@@ -10,7 +10,7 @@ export const Toggle: React.FC<{
 
   return (
     <>
-      <label className="inline-flex cursor-pointer select-none items-center justify-center rounded-md bg-bg-dark p-1">
+      <label className="inline-flex cursor-pointer select-none items-center justify-center rounded-md bg-bg-medium p-1">
         <input
           type="checkbox"
           className="sr-only transition"
@@ -18,14 +18,14 @@ export const Toggle: React.FC<{
           onChange={handleCheckboxChange}
         />
         <span
-          className={`flex items-center rounded py-2 px-3 text-sm font-medium transition ${
+          className={`flex items-center rounded py-1 px-2 lg:py-2 lg:px-3 text-sm font-medium transition ${
             !state ? "text-text-light bg-blue-600" : "text-text-light"
           }`}
         >
           {disabledText}
         </span>
         <span
-          className={`flex items-center rounded py-2 px-3 text-sm font-medium transition ${
+          className={`flex items-center rounded py-1 px-2 lg:py-2 lg:px-3 text-sm font-medium transition ${
             state ? "text-text-light bg-amber-600" : "text-text-light"
           }`}
         >

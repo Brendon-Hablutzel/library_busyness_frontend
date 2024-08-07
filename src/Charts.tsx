@@ -73,9 +73,6 @@ const CustomTooltip: React.FC<TooltipProps<ValueType, NameType>> = ({
     return (
       <div className="bg-bg-dark rounded-md p-2 bg-opacity-75">
         <h2 className="font-semibold">{formatTimestampFull(label)}</h2>
-        {/* TODO: this loop puts tooltip series labels in the reverse order
-        from what appears on the graph (bottommost series on the graph becomes topmost) 
-        on the tooltip*/}
         {payload.map((series, idx) => {
           const color = series.color
             ? `text-[${series.color}]`
@@ -157,7 +154,7 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
   return (
     <ResponsiveContainer width="100%" height="100%">
       {/* margin is so that rotated ticks don't get cut off */}
-      <ComposedChart data={data} margin={{ bottom: 60, left: 8 }}>
+      <ComposedChart data={data} margin={{ bottom: 60, left: -8 }}>
         <Tooltip content={<CustomTooltip />} animationDuration={200} />
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
@@ -165,10 +162,11 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
           tick={{ fill: "#d4d4d4" }}
           tickFormatter={formatTimestampSimple}
           tickMargin={15}
-          angle={-45}
+          angle={-55}
           dx={-30}
-          dy={20}
+          dy={25}
           minTickGap={35}
+          fontSize={15}
           // this ensures that spacing between data points is proportional
           // to the duration between those data points
           scale={scaleTime()}

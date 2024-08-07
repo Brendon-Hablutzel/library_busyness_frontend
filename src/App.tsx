@@ -9,7 +9,6 @@ import {
 import { BusynessAreaChart /*ForecastMetricsChart*/ } from "./Charts";
 import {
   capitalize,
-  formatPercent,
   getNearestItemByFn,
   nDaysBefore,
   nHoursAfter,
@@ -47,19 +46,27 @@ const LibraryComponent: React.FC<LibraryComponentProps> = ({
     case "loading": {
       return (
         <div className={className}>
-          <h1 className="text-center p-5">
-            Fetching {formattedLibrary} data...
-          </h1>
+          <div className="bg-bg-dark rounded-lg p-2 shadow-maincard">
+            <h1 className="text-4xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-6xl font-bold mb-1">
+              {formattedLibrary}
+            </h1>
+            <h2 className="text-xl">Loading data, please wait...</h2>
+          </div>
         </div>
       );
     }
     case "loaded-error": {
       return (
         <div className={className}>
-          <h1 className="text-center p-5">
-            Error fetching {formattedLibrary} data - if you are using an
-            adblocker, try disabling it
-          </h1>
+          <div className="bg-bg-dark rounded-lg p-2 shadow-maincard">
+            <h1 className="text-4xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-6xl font-bold mb-1">
+              {formattedLibrary}
+            </h1>
+            <h2 className="text-xl text-red-500">
+              Sorry, there was an error loading occupancy data. Please try
+              again.
+            </h2>
+          </div>
         </div>
       );
     }
@@ -67,7 +74,9 @@ const LibraryComponent: React.FC<LibraryComponentProps> = ({
       const { records, mostRecentRecord, forecasts } = dataResponse;
 
       const mostRecentCount = mostRecentRecord.total_count;
-      const mostRecentPercent = mostRecentRecord.total_percent;
+      const mostRecentPercent = Math.round(
+        100 * mostRecentRecord.total_percent
+      );
 
       const hourAheadRecord = getNearestItemByFn<HillForecast | HuntForecast>(
         forecasts,
@@ -79,7 +88,9 @@ const LibraryComponent: React.FC<LibraryComponentProps> = ({
 
       const nextHourPercentChange =
         hourAheadCount !== undefined
-          ? (hourAheadCount - mostRecentCount) / mostRecentCount
+          ? Math.round(
+              (100 * (hourAheadCount - mostRecentCount)) / mostRecentCount
+            )
           : undefined;
 
       const oneDayAgo = nDaysBefore(now, 1);
@@ -93,102 +104,95 @@ const LibraryComponent: React.FC<LibraryComponentProps> = ({
 
       const lastDayPercentChange =
         dayAgoCount !== undefined
-          ? (mostRecentCount - dayAgoCount) / dayAgoCount
+          ? Math.round((100 * (mostRecentCount - dayAgoCount)) / dayAgoCount)
           : undefined;
 
       return (
         <div className={className}>
-          <div className="min-h-[10vh] p-5 xl:px-10">
-            <h2 className="text-4xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-6xl font-bold">
-              {formattedLibrary}
-            </h2>
-            <div className="lg:flex lg:justify-between">
-              <div className="flex justify-between lg:block">
-                <h3 className="text-3xl md:text-4xl lg:text-3xl xl:text-3xl 2xl:text-4xl">
-                  <span className="font-semibold">{mostRecentCount}</span>{" "}
-                  people
-                </h3>
-                <h3 className="text-3xl md:text-4xl lg:text-2xl xl:text-2xl 2xl:text-3xl">
-                  <span className="font-semibold">
-                    {formatPercent(mostRecentPercent)}
-                  </span>{" "}
-                  full
-                </h3>
-              </div>
-              <div className="lg:text-right">
-                {nextHourPercentChange === undefined ||
-                Math.round(nextHourPercentChange * 100) === 0 ? (
-                  <div className="text-lg md:text-2xl lg:text-3xl xl:text-3xl 2xl:text-4xl">
-                    busyness not expected to change over the next hour
+          <div className="bg-bg-dark rounded-lg p-2 md:p-4 shadow-maincard lg:p-5">
+            <div className="mb-2">
+              <h2 className="text-4xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-6xl font-bold mb-1">
+                {formattedLibrary}
+              </h2>
+              <div className="lg:flex lg:justify-between pb-4">
+                <div className="flex justify-between items-center flex-row lg:gap-5 xl:gap-10 2xl:gap-15 mb-4 lg:mb-0">
+                  <h3 className="text-3xl md:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl">
+                    <span className="font-semibold">{mostRecentCount}</span>{" "}
+                    people
+                  </h3>
+                  <h3 className="text-3xl md:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl">
+                    <span className="font-semibold">{mostRecentPercent}%</span>{" "}
+                    full
+                  </h3>
+                </div>
+                <div className="flex flex-col lg:flex-row lg:items-center gap-4 md:gap-4">
+                  <div
+                    className={`bg-bg-medium p-1 lg:p-2 rounded-md shadow-lg border-l-8 ${nextHourPercentChange === undefined || nextHourPercentChange === 0 ? "border-l-yellow-500" : nextHourPercentChange > 0 ? "border-l-red-500" : "border-l-green-500"}`}
+                  >
+                    <div className="text-lg md:text-3xl lg:text-xl xl:text-2xl 2xl:text-3xl lg:px-1 xl:px-2">
+                      <span
+                        className={`font-semibold ${nextHourPercentChange === undefined || nextHourPercentChange === 0 ? "text-yellow-500" : nextHourPercentChange > 0 ? "text-red-500" : "text-green-500"}`}
+                      >
+                        {nextHourPercentChange === undefined ||
+                        nextHourPercentChange === 0
+                          ? "no change"
+                          : `${nextHourPercentChange > 0 ? "⇧" : "⇩"} ${Math.abs(nextHourPercentChange)}%`}
+                      </span>{" "}
+                      over the next hour
+                    </div>
                   </div>
-                ) : (
-                  <div className="text-lg md:text-2xl lg:text-3xl xl:text-3xl 2xl:text-4xl">
-                    busyness expected to go{" "}
-                    {nextHourPercentChange > 0 ? "up" : "down"} by{" "}
-                    <span
-                      className={`${nextHourPercentChange > 0 ? "text-red-500" : "text-green-500"} font-semibold`}
-                    >
-                      {formatPercent(nextHourPercentChange, true)}
-                    </span>{" "}
-                    over the next hour
+                  <div
+                    className={`bg-bg-medium p-1 lg:p-2 rounded-md shadow-lg border-l-8 ${lastDayPercentChange === undefined || lastDayPercentChange === 0 ? "border-l-yellow-500" : lastDayPercentChange > 0 ? "border-l-red-500" : "border-l-green-500"}`}
+                  >
+                    <div className="text-lg md:text-3xl lg:text-xl xl:text-2xl 2xl:text-3xl lg:px-1 xl:px-2">
+                      <span
+                        className={`font-semibold ${lastDayPercentChange === undefined || lastDayPercentChange === 0 ? "text-yellow-500" : lastDayPercentChange > 0 ? "text-red-500" : "text-green-500"}`}
+                      >
+                        {lastDayPercentChange === undefined ||
+                        lastDayPercentChange === 0
+                          ? "no change"
+                          : `${lastDayPercentChange > 0 ? "⇧" : "⇩"} ${Math.abs(lastDayPercentChange)}%`}
+                      </span>{" "}
+                      from yesterday at this time
+                    </div>
                   </div>
-                )}
-                {lastDayPercentChange === undefined ||
-                Math.round(lastDayPercentChange * 100) === 0 ? (
-                  <div className="text-md md:text-xl lg:text-2xl xl:text-2xl 2xl:text-3xl">
-                    no change in busyness compared to this time yesterday
-                  </div>
-                ) : (
-                  <div className="text-md md:text-2xl lg:text-2xl xl:text-2xl 2xl:text-3xl">
-                    busyness{" "}
-                    <span
-                      className={`${lastDayPercentChange > 0 ? "text-red-500" : "text-green-500"} font-semibold`}
-                    >
-                      {formatPercent(lastDayPercentChange, true)}
-                    </span>{" "}
-                    {lastDayPercentChange > 0 ? "higher" : "lower"} than this
-                    time yesterday
-                  </div>
-                )}
+                </div>
               </div>
             </div>
-          </div>
-          {/* 98vw is a hack because responsive container at 100vw makes its parent
+            {/* 98vw is a hack because responsive container at 100vw makes its parent
           element overflow */}
-          <div className="flex justify-center w-[98vw] h-[35vh] lg:h-[50vh]">
-            <BusynessAreaChart
-              // type assertion is valid because of LibraryComponent props
-              recordOptions={
-                { library, records, forecasts } as
-                  | {
-                      library: "hill";
-                      records: HillData[];
-                      forecasts: HillForecast[];
-                    }
-                  | {
-                      library: "hunt";
-                      records: HuntData[];
-                      forecasts: HuntForecast[];
-                    }
-              }
-              displayType={displayType ? "percent" : "count"}
-              now={now}
-            />
-          </div>
-          <div className="min-h-[3vh] p-5 xl:px-10 flex justify-between">
-            <div>
-              {/* this is wrapped in a div to prevent Toggle from taking up 
-              the full flex div's height */}
-              <Toggle
-                disabledText="counts"
-                enabledText="percent"
-                state={displayType}
-                setState={setDisplayType}
+            <div className="flex justify-center h-[35vh] lg:h-[50vh] mb-4">
+              <BusynessAreaChart
+                // type assertion is valid because of LibraryComponent props
+                recordOptions={
+                  { library, records, forecasts } as
+                    | {
+                        library: "hill";
+                        records: HillData[];
+                        forecasts: HillForecast[];
+                      }
+                    | {
+                        library: "hunt";
+                        records: HuntData[];
+                        forecasts: HuntForecast[];
+                      }
+                }
+                displayType={displayType ? "percent" : "count"}
+                now={now}
               />
             </div>
-            {/* <div className="text-right">
-              Last checked {formattedLibrary} busyness at {at.toLocaleString()}
-            </div> */}
+            <div className="mt-5 mb-1 flex justify-between">
+              <div>
+                {/* this is wrapped in a div to prevent Toggle from taking up 
+              the full flex div's height */}
+                <Toggle
+                  disabledText="counts"
+                  enabledText="percent"
+                  state={displayType}
+                  setState={setDisplayType}
+                />
+              </div>
+            </div>
           </div>
           {/* TODO: option to show areas? */}
         </div>
@@ -197,7 +201,12 @@ const LibraryComponent: React.FC<LibraryComponentProps> = ({
     case "loaded-notfound": {
       return (
         <div className={className}>
-          <h1 className="text-center p-5">No {formattedLibrary} data found</h1>
+          <div className="bg-bg-dark rounded-lg p-2 shadow-maincard">
+            <h1 className="text-4xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-6xl font-bold mb-1">
+              {formattedLibrary}
+            </h1>
+            <h2 className="text-xl">No data found, try again later.</h2>
+          </div>
         </div>
       );
     }
@@ -252,35 +261,37 @@ export const App: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-[10vh] max-w-[100vw] flex justify-center items-center bg-bg-darkest text-text-light">
-        <h1 className="p-5 pb-0 text-3xl md:text-6xl lg:text-6xl xl:text-6xl 2xl:text-7xl text-center">
-          NCSU Library Busyness
-        </h1>
-      </div>
-      <LibraryComponent
-        data={{
-          library: "hill",
-          dataResponse: hillDataResponse,
-        }}
-        now={now}
-        className="max-w-[100vw] min-h-[55vh] bg-bg-darkest text-text-light"
-      />
-      <LibraryComponent
-        data={{
-          library: "hunt",
-          dataResponse: huntDataResponse,
-        }}
-        now={now}
-        className="max-w-[100vw] min-h-[55vh] bg-bg-darkest text-text-light"
-      />
-      <div className="h-[10vh] bg-bg-darkest text-text-light text-center text-sm sm:text-lg md:text-xl">
-        Last checked for new data at {now.toLocaleString()}
-      </div>
-      <hr className="pb-10 bg-bg-darkest" />
-      {/* <div className="flex justify-center w-[98vw] h-[35vh] lg:h-[50vh]">
+      <div className="min-h-[100vh] bg-bg-darkest text-text-light">
+        <div className="min-h-[10vh] max-w-[100vw] flex justify-center items-center">
+          <h1 className="p-5 font-bold filter drop-shadow-header text-3xl md:text-6xl lg:text-6xl xl:text-6xl 2xl:text-7xl text-center">
+            NCSU Library Busyness
+          </h1>
+        </div>
+        <LibraryComponent
+          data={{
+            library: "hill",
+            dataResponse: hillDataResponse,
+          }}
+          now={now}
+          className="max-w-[100vw] p-2 lg:p-5"
+        />
+        <LibraryComponent
+          data={{
+            library: "hunt",
+            dataResponse: huntDataResponse,
+          }}
+          now={now}
+          className="max-w-[100vw] p-2 lg:p-5"
+        />
+        <div className="flex flex-col justify-center text-center py-8 px-2 text-sm sm:text-lg md:text-xl">
+          <div>Last checked for new data at {now.toLocaleString()}</div>
+        </div>
+        {/* <hr className="pb-10 bg-bg-darkest" /> */}
+        {/* <div className="flex justify-center w-[98vw] h-[35vh] lg:h-[50vh]">
         <ForecastMetricsChart />
       </div> */}
-      <MetricsComponent className="min-h-[10vh] bg-bg-darkest text-text-light" />
+        {/* <MetricsComponent className="min-h-[10vh] bg-bg-darkest text-text-light" /> */}
+      </div>
     </>
   );
 };
