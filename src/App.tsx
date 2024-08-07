@@ -14,7 +14,7 @@ import {
   nHoursAfter,
 } from "./utils";
 import { Toggle } from "./Toggle";
-import { MetricsComponent } from "./Metrics";
+// import { MetricsComponent } from "./Metrics";
 
 interface LibraryComponentProps {
   data:

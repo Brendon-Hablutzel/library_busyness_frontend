@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { fetchMetrics, MetricsApiResponse } from "./utils/backend";
-import { capitalize, formatPercent, nWeeksBefore } from "./utils";
+import { capitalize, /*formatPercent*/ nWeeksBefore } from "./utils";
 import { ForecastMetricsChart } from "./Charts";
 
 export const MetricsComponent: React.FC<{ className: string }> = ({
