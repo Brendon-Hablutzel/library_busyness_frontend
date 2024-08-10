@@ -36,8 +36,23 @@ export const Metrics: React.FC = () => {
               </h1>
             </div>
           </div>
-          <div className="text-center">
-            Loading metrics, this will take a few seconds...
+          <div className="flex justify-center">
+            <div className="flex gap-2 items-center text-2xl">
+              <h2 className="">Loading data, please wait</h2>
+              <div className="flex">
+                <div className="justify-between gap-2 inline-flex">
+                  <span className="block relative box-border animate-[grow-shrink_1.5s_ease-in-out_infinite_0ms]">
+                    .
+                  </span>
+                  <span className="block relative box-border animate-[grow-shrink_1.5s_ease-in-out_infinite_200ms]">
+                    .
+                  </span>
+                  <span className="block relative box-border animate-[grow-shrink_1.5s_ease-in-out_infinite_400ms]">
+                    .
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       );

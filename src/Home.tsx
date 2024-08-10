@@ -50,7 +50,22 @@ const LibraryComponent: React.FC<LibraryComponentProps> = ({
             <h1 className="text-4xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-6xl font-bold mb-1">
               {formattedLibrary}
             </h1>
-            <h2 className="text-2xl">Loading data, please wait...</h2>
+            <div className="flex gap-2 items-center text-2xl">
+              <h2 className="">Loading data, please wait</h2>
+              <div className="flex">
+                <div className="justify-between gap-2 inline-flex">
+                  <span className="block relative box-border animate-[grow-shrink_1.5s_ease-in-out_infinite_0ms]">
+                    .
+                  </span>
+                  <span className="block relative box-border animate-[grow-shrink_1.5s_ease-in-out_infinite_200ms]">
+                    .
+                  </span>
+                  <span className="block relative box-border animate-[grow-shrink_1.5s_ease-in-out_infinite_400ms]">
+                    .
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       );
