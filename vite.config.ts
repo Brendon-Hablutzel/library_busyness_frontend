@@ -6,7 +6,7 @@ import tailwindcss from "tailwindcss";
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   return {
-    // base: "/library_busyness_frontend",
+    base: "/library_busyness_frontend",
     plugins: [react()],
     define: {
       "process.env.REACT_APP_HISTORICAL_RECORDS_API_URL": JSON.stringify(

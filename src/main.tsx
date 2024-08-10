@@ -5,17 +5,15 @@ import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./Home.tsx";
 import ErrorPage from "./ErrorPage.tsx";
-import { Metrics } from "./Metrics.tsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     errorElement: <ErrorPage />,
-    element: <Home />,
   },
   {
-    path: "/metrics",
-    element: <Metrics />,
+    path: "/library_busyness_frontend",
+    element: <Home />,
   },
 ]);
 
