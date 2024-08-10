@@ -58,9 +58,11 @@ const getGraphColorPercent = (idx: number): string => {
 const formatSeriesName = (s: string) => {
   const components = s.split("_");
   const capitalizedName = capitalize(components[0]);
-  return s.includes("forecast")
-    ? `${capitalizedName} (forecast)`
-    : capitalizedName;
+  return s.includes("predicted")
+    ? `${capitalizedName} (predicted)`
+    : s.includes("actual")
+      ? `${capitalizedName} (observed)`
+      : capitalizedName;
 };
 
 const CustomTooltip: React.FC<TooltipProps<ValueType, NameType>> = ({
@@ -270,14 +272,6 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
   );
 };
 
-// type PairedRecord = {
-//   // "record_datetime": number,
-//   actual_total_percent: number;
-//   predicted_total_percent: number;
-//   actual_total_count: number;
-//   predicted_total_count: number;
-// };
-
 export interface ForecastMetricsChartProps {
   records: {
     record_datetime: number;
@@ -304,31 +298,38 @@ export const ForecastMetricsChart: React.FC<ForecastMetricsChartProps> = ({
   return (
     <ResponsiveContainer width="100%" height="100%">
       {/* margin is so that rotated ticks don't get cut off */}
-      <ComposedChart data={parsedRecords} margin={{ left: 8 }}>
-        <Tooltip animationDuration={200} />
+      <ComposedChart data={parsedRecords} margin={{ left: -8 }}>
+        <Tooltip content={<CustomTooltip />} animationDuration={200} />
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
           dataKey="record_datetime"
           tick={{ fill: "#d4d4d4" }}
           tickFormatter={formatTimestampSimple}
           tickMargin={15}
-          angle={-45}
+          angle={-55}
           dx={-30}
           dy={25}
           minTickGap={35}
+          fontSize={15}
           // this ensures that spacing between data points is proportional
           // to the duration between those data points
           scale={scaleTime()}
-          height={105}
+          height={110}
         />
         <YAxis tick={{ fill: "#d4d4d4" }} />
-        <Area dataKey="total_count_actual" animationDuration={500} />
+        <Area
+          dataKey="total_count_actual"
+          animationDuration={500}
+          fill="#589dd6"
+          stroke="#589dd6"
+          strokeWidth={0}
+        />
         <Line
           dataKey="total_count_predicted"
           animationDuration={500}
           dot={false}
-          stroke="#00d636"
-          strokeWidth={2}
+          stroke="#ffffff"
+          strokeWidth={1}
         />
         <Brush travellerWidth={10} gap={5} height={25} />
       </ComposedChart>

@@ -29,6 +29,7 @@ export default {
     "text-[#1E90FF]",
     "text-[#1ca9d9]",
     "text-[#e3a02d]",
+    "text-[#3182bd]",
   ],
   plugins: [],
 };

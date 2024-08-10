@@ -159,8 +159,6 @@ const LibraryComponent: React.FC<LibraryComponentProps> = ({
                 </div>
               </div>
             </div>
-            {/* 98vw is a hack because responsive container at 100vw makes its parent
-          element overflow */}
             <div className="flex justify-center h-[35vh] lg:h-[50vh] mb-4">
               <BusynessAreaChart
                 // type assertion is valid because of LibraryComponent props
@@ -217,7 +215,7 @@ export const ComparisonComponent: React.FC = () => {
   return <div></div>;
 };
 
-export const App: React.FC = () => {
+export const Home: React.FC = () => {
   // not using state causes glitches
   const [now, setNow] = useState(new Date());
 
@@ -262,7 +260,7 @@ export const App: React.FC = () => {
   return (
     <>
       <div className="min-h-[100vh] bg-bg-darkest text-text-light">
-        <div className="min-h-[10vh] max-w-[100vw] flex justify-center items-center">
+        <div className="flex justify-center items-center">
           <h1 className="p-5 font-bold filter drop-shadow-header text-3xl md:text-6xl lg:text-6xl xl:text-6xl 2xl:text-7xl text-center">
             NCSU Library Busyness
           </h1>
@@ -286,14 +284,9 @@ export const App: React.FC = () => {
         <div className="flex flex-col justify-center text-center py-8 px-2 text-sm sm:text-lg md:text-xl">
           <div>Last checked for new data at {now.toLocaleString()}</div>
         </div>
-        {/* <hr className="pb-10 bg-bg-darkest" /> */}
-        {/* <div className="flex justify-center w-[98vw] h-[35vh] lg:h-[50vh]">
-        <ForecastMetricsChart />
-      </div> */}
-        {/* <MetricsComponent className="min-h-[10vh] bg-bg-darkest text-text-light" /> */}
       </div>
     </>
   );
 };
 
-export default App;
+export default Home;
