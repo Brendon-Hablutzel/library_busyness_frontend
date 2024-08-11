@@ -121,7 +121,7 @@ export const Metrics: React.FC = () => {
                               libraryMetrics.overall.meanAbsoluteError
                             )}{" "}
                             people
-                          </span>{" "}
+                          </span>
                         </div>
                       </div>
                       <div

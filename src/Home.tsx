@@ -6,7 +6,7 @@ import {
   HillDataResponse,
   HuntDataResponse,
 } from "./utils/backend";
-import { BusynessAreaChart /*ForecastMetricsChart*/ } from "./Charts";
+import { BusynessAreaChart } from "./Charts";
 import {
   capitalize,
   getNearestItemByFn,
@@ -14,7 +14,6 @@ import {
   nHoursAfter,
 } from "./utils";
 import { Toggle } from "./Toggle";
-// import { MetricsComponent } from "./Metrics";
 
 interface LibraryComponentProps {
   data:
@@ -87,6 +86,17 @@ const LibraryComponent: React.FC<LibraryComponentProps> = ({
     }
     case "loaded-found": {
       const { records, mostRecentRecord, forecasts } = dataResponse;
+
+      const windowWidth = window.innerWidth;
+
+      const minWidthPerDataPoint = 2;
+
+      const numSelectedRecords = Math.min(
+        windowWidth / minWidthPerDataPoint,
+        dataResponse.records.length
+      );
+
+      const selectedRecords = dataResponse.records.slice(-numSelectedRecords);
 
       const mostRecentCount = mostRecentRecord.total_count;
       const mostRecentPercent = Math.round(
@@ -178,7 +188,7 @@ const LibraryComponent: React.FC<LibraryComponentProps> = ({
               <BusynessAreaChart
                 // type assertion is valid because of LibraryComponent props
                 recordOptions={
-                  { library, records, forecasts } as
+                  { library, records: selectedRecords, forecasts } as
                     | {
                         library: "hill";
                         records: HillData[];
@@ -254,7 +264,7 @@ export const Home: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      const hillDataResponse = await fetchHillRecords(nDaysBefore(now, 4));
+      const hillDataResponse = await fetchHillRecords(nDaysBefore(now, 7));
 
       setHillDataResponse(hillDataResponse);
     })();
@@ -266,7 +276,7 @@ export const Home: React.FC = () => {
 
   useEffect(() => {
     (async () => {
-      const huntDataResponse = await fetchHuntRecords(nDaysBefore(now, 4));
+      const huntDataResponse = await fetchHuntRecords(nDaysBefore(now, 7));
 
       setHuntDataResponse(huntDataResponse);
     })();
