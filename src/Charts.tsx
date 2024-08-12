@@ -260,11 +260,12 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
           />
         )}
         <ReferenceLine
-          // place the reference line just ahead of the current time (7 mins)
+          // place the reference line just ahead of the current time (10 mins)
           // to fill the gap between last record and first forecast
-          x={nMinutesAfter(now, 7).valueOf()}
+          x={nMinutesAfter(now, 10).valueOf()}
           stroke="#fc0303"
-          strokeWidth={1.5}
+          // 1024px is the breakpoint for tailwind lg
+          strokeWidth={window.innerWidth > 1024 ? 1 : 0.5}
         />
         {/* <Brush startIndex={100} /> */}
       </ComposedChart>

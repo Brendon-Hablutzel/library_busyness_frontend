@@ -184,7 +184,7 @@ const LibraryComponent: React.FC<LibraryComponentProps> = ({
                 </div>
               </div>
             </div>
-            <div className="flex justify-center h-[35vh] lg:h-[50vh] mb-4">
+            <div className="flex justify-center h-[20rem] lg:h-[30rem] max-h-[80vh] mb-4">
               <BusynessAreaChart
                 // type assertion is valid because of LibraryComponent props
                 recordOptions={
