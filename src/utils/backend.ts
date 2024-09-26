@@ -74,8 +74,15 @@ export const fetchHillRecords = async (
 
     const forecastsResult = await fetch(getForecastsUrl("hill", new Date()));
     const parsedForecasts = await forecastsResult.json();
-    const forecasts =
-      (await parsedForecasts.busynessForecastRecords) as HillForecast[];
+    const forecasts = (
+      (await parsedForecasts.busynessForecastRecords) as HillForecast[]
+    ).map((forecast) => {
+      return {
+        ...forecast,
+        total_count: Math.max(0, forecast.total_count),
+        total_percent: Math.max(0, forecast.total_percent),
+      };
+    });
 
     if (records.length > 0) {
       // cannot be undefined because there is at least one record
@@ -113,8 +120,15 @@ export const fetchHuntRecords = async (
 
     const forecastsResult = await fetch(getForecastsUrl("hunt", new Date()));
     const parsedForecasts = await forecastsResult.json();
-    const forecasts =
-      (await parsedForecasts.busynessForecastRecords) as HuntForecast[];
+    const forecasts = (
+      (await parsedForecasts.busynessForecastRecords) as HuntForecast[]
+    ).map((forecast) => {
+      return {
+        ...forecast,
+        total_count: Math.max(0, forecast.total_count),
+        total_percent: Math.max(0, forecast.total_percent),
+      };
+    });
 
     if (records.length > 0) {
       // cannot be undefined because there is at least one record
