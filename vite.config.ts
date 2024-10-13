@@ -15,6 +15,9 @@ export default defineConfig(({ mode }) => {
       "process.env.REACT_APP_FORECASTS_API_URL": JSON.stringify(
         env.REACT_APP_FORECASTS_API_URL
       ),
+      "process.env.REACT_APP_METRICS_API_URL": JSON.stringify(
+        env.REACT_APP_METRICS_API_URL
+      ),
     },
     css: {
       postcss: {

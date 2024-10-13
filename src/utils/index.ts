@@ -23,24 +23,6 @@ export const maxByFn = <T>(
   return max;
 };
 
-// export const getNLargestByFn = <T>(
-//   arr: T[],
-//   fn: (item: T) => number,
-//   n: number
-// ): T[] => {
-//   if (n <= 0) {
-//     return [];
-//   }
-
-//   const ascendingArr = arr.sort((a, b) => fn(a) - fn(b));
-
-//   if (n >= ascendingArr.length) {
-//     return ascendingArr;
-//   }
-
-//   return ascendingArr.slice(-n);
-// };
-
 export const getLargerThanByFn = <T>(
   arr: T[],
   fn: (item: T) => number,
