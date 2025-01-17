@@ -139,14 +139,14 @@ export const Metrics: React.FC = () => {
       <div className="p-5 flex flex-col gap-5">
         <div className="flex justify-center items-center">
           <h1 className="font-bold filter drop-shadow-header text-3xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-6xl 2xl:text-7xl text-center">
-            NC State Library Busyness
+            NC State Library Busyness Metrics
           </h1>
         </div>
-        <div className="flex justify-center items-center">
+        {/* <div className="flex justify-center items-center">
           <h1 className="font-bold filter drop-shadow-header text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-3xl 2xl:text-4xl text-center">
             Forecast Metrics
           </h1>
-        </div>
+        </div> */}
       </div>
       {component}
     </div>
