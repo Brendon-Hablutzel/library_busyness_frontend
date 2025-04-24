@@ -12,17 +12,17 @@ export default {
         "text-highlight": "#9e0000",
       },
       dropShadow: {
-        header: "0.05em 0.1em 0.07em rgb(0,0,0,0.5)",
+        header: "0.05em 0.1em 0.07em rgb(0,0,0,0.1)",
       },
       boxShadow: {
-        // horiontal offset, vertical offset, blur radius, spread radius, color
+        // horizontal offset, vertical offset, blur radius, spread radius, color
         maincard: "0.1em 0.3em 0.5em 0.3em rgb(0,0,0,0.25)",
       },
       keyframes: {
         "grow-shrink": {
-          "0%": { transform: "scale(0.75)" },
+          "0%": { transform: "scale(0.5)" },
           "50%": { transform: "scale(1)" },
-          "100%": { transform: "scale(0.75)" },
+          "100%": { transform: "scale(0.5)" },
         },
       },
     },

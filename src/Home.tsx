@@ -23,13 +23,13 @@ const LoadingLibraryComponent: React.FC = () => {
       <h2 className="">Loading data, please wait</h2>
       <div className="flex">
         <div className="justify-between gap-2 inline-flex">
-          <span className="block relative box-border animate-[grow-shrink_1.5s_ease-in-out_infinite_0ms]">
+          <span className="block relative box-border animate-[grow-shrink_1s_ease-in-out_infinite_0ms]">
             .
           </span>
-          <span className="block relative box-border animate-[grow-shrink_1.5s_ease-in-out_infinite_200ms]">
+          <span className="block relative box-border animate-[grow-shrink_1s_ease-in-out_infinite_200ms]">
             .
           </span>
-          <span className="block relative box-border animate-[grow-shrink_1.5s_ease-in-out_infinite_400ms]">
+          <span className="block relative box-border animate-[grow-shrink_1s_ease-in-out_infinite_400ms]">
             .
           </span>
         </div>
@@ -182,50 +182,50 @@ const LibraryComponent: React.FC<{
   // to either error or loaded
   let component: React.ReactElement = <LoadingLibraryComponent />;
 
-  switch (status) {
-    case ResponseStatus.ERROR: {
-      console.error(data.error);
+  // switch (status) {
+  //   case ResponseStatus.ERROR: {
+  //     console.error(data.error);
 
-      component = (
-        <h2 className="text-2xl text-red-500">
-          Sorry, there was an error loading occupancy data. Please try again.
-        </h2>
-      );
-      break;
-    }
-    case ResponseStatus.LOADED: {
-      const { historicalRecords, forecastRecords } = data;
+  //     component = (
+  //       <h2 className="text-2xl text-red-500">
+  //         Sorry, there was an error loading occupancy data. Please try again.
+  //       </h2>
+  //     );
+  //     break;
+  //   }
+  //   case ResponseStatus.LOADED: {
+  //     const { historicalRecords, forecastRecords } = data;
 
-      const mostRecentHistoricalRecord = maxByFn(historicalRecords, (record) =>
-        record.record_datetime.valueOf()
-      );
+  //     const mostRecentHistoricalRecord = maxByFn(historicalRecords, (record) =>
+  //       record.record_datetime.valueOf()
+  //     );
 
-      if (
-        historicalRecords.length === 0 ||
-        mostRecentHistoricalRecord === undefined
-      ) {
-        // if there are no historical records, don't display anything--trying to render with
-        // no historical records will cause issues with the graph and the change over time stats
-        component = (
-          <h2 className="text-2xl">No data found, try again later.</h2>
-        );
-        break;
-      }
+  //     if (
+  //       historicalRecords.length === 0 ||
+  //       mostRecentHistoricalRecord === undefined
+  //     ) {
+  //       // if there are no historical records, don't display anything--trying to render with
+  //       // no historical records will cause issues with the graph and the change over time stats
+  //       component = (
+  //         <h2 className="text-2xl">No data found, try again later.</h2>
+  //       );
+  //       break;
+  //     }
 
-      // displays a successfully loaded library (e.g., historical records were found, and
-      // probably forecast too, but this it not required--it will display fine without
-      // forecasts)
-      component = (
-        <LoadedLibraryComponent
-          historicalRecords={historicalRecords}
-          forecastRecords={forecastRecords}
-          mostRecentHistoricalRecord={mostRecentHistoricalRecord}
-          library={library}
-          now={now}
-        />
-      );
-    }
-  }
+  //     // displays a successfully loaded library (e.g., historical records were found, and
+  //     // probably forecast too, but this it not required--it will display fine without
+  //     // forecasts)
+  //     component = (
+  //       <LoadedLibraryComponent
+  //         historicalRecords={historicalRecords}
+  //         forecastRecords={forecastRecords}
+  //         mostRecentHistoricalRecord={mostRecentHistoricalRecord}
+  //         library={library}
+  //         now={now}
+  //       />
+  //     );
+  //   }
+  // }
 
   // display the header with the corresponding component--loading, loaded, or error
   return (
@@ -285,25 +285,27 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-[100vh] bg-bg-darkest text-text-light">
-      <div className="flex justify-center items-center">
-        <h1 className="p-5 font-bold filter drop-shadow-header text-3xl md:text-6xl lg:text-6xl xl:text-6xl 2xl:text-7xl text-center">
-          NC State Library Busyness
-        </h1>
-      </div>
-      <LibraryComponent
-        library="hill"
-        data={hillDataResponse}
-        now={now}
-        className="max-w-[100vw] p-2 lg:p-5"
-      />
-      <LibraryComponent
-        library="hunt"
-        data={huntDataResponse}
-        now={now}
-        className="max-w-[100vw] p-2 lg:p-5"
-      />
-      <div className="flex flex-col justify-center text-center py-8 px-2 text-sm sm:text-lg md:text-xl">
-        <div>Last checked for new data at {now.toLocaleString()}</div>
+      <div className="flex flex-col justify-between gap-4 lg:gap-6 p-4 lg:p-6">
+        <div className="flex justify-center items-center">
+          <h1 className="sm:py-2 lg:p-0 font-bold filter drop-shadow-header text-2xl sm:text-4xl 2xl:text-5xl text-center">
+            NC State Library Busyness
+          </h1>
+        </div>
+        <LibraryComponent
+          library="hill"
+          data={hillDataResponse}
+          now={now}
+          className="max-w-[100vw]"
+        />
+        <LibraryComponent
+          library="hunt"
+          data={huntDataResponse}
+          now={now}
+          className="max-w-[100vw]"
+        />
+        <div className="flex flex-col justify-center text-center py-8 px-2 text-sm sm:text-lg md:text-xl">
+          <div>Last checked for new data at {now.toLocaleString()}</div>
+        </div>
       </div>
     </div>
   );

@@ -37,7 +37,7 @@ const LoadedMetricsComponent: React.FC<{
   metrics: LibraryMetrics;
 }> = ({ metrics }) => {
   return (
-    <div className="max-w-[100vw] p-2 lg:p-5">
+    <div className="max-w-[100vw] mb-5">
       <div className="bg-bg-dark rounded-lg shadow-maincard p-2 md:p-4 lg:p-5">
         <div className="mb-2 lg:flex lg:justify-between lg:items-center">
           <h2 className="text-4xl sm:text-5xl md:text-5xl lg:text-5xl xl:text-5xl 2xl:text-6xl font-bold">
@@ -136,9 +136,9 @@ export const Metrics: React.FC = () => {
 
   return (
     <div className="min-h-[100vh] max-w-[100vw] bg-bg-darkest text-text-light">
-      <div className="p-5 flex flex-col gap-5">
+      <div className="flex flex-col justify-between gap-4 lg:gap-6 p-4 lg:p-6">
         <div className="flex justify-center items-center">
-          <h1 className="font-bold filter drop-shadow-header text-3xl sm:text-5xl md:text-6xl lg:text-6xl xl:text-6xl 2xl:text-7xl text-center">
+          <h1 className="sm:py-2 lg:p-0 font-bold filter drop-shadow-header text-2xl sm:text-4xl 2xl:text-5xl text-center">
             NC State Library Busyness Metrics
           </h1>
         </div>
@@ -147,8 +147,8 @@ export const Metrics: React.FC = () => {
             Forecast Metrics
           </h1>
         </div> */}
+        {component}
       </div>
-      {component}
     </div>
   );
 };
