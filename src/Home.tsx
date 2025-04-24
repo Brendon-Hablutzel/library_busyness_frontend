@@ -182,50 +182,50 @@ const LibraryComponent: React.FC<{
   // to either error or loaded
   let component: React.ReactElement = <LoadingLibraryComponent />;
 
-  // switch (status) {
-  //   case ResponseStatus.ERROR: {
-  //     console.error(data.error);
+  switch (status) {
+    case ResponseStatus.ERROR: {
+      console.error(data.error);
 
-  //     component = (
-  //       <h2 className="text-2xl text-red-500">
-  //         Sorry, there was an error loading occupancy data. Please try again.
-  //       </h2>
-  //     );
-  //     break;
-  //   }
-  //   case ResponseStatus.LOADED: {
-  //     const { historicalRecords, forecastRecords } = data;
+      component = (
+        <h2 className="text-2xl text-red-500">
+          Sorry, there was an error loading occupancy data. Please try again.
+        </h2>
+      );
+      break;
+    }
+    case ResponseStatus.LOADED: {
+      const { historicalRecords, forecastRecords } = data;
 
-  //     const mostRecentHistoricalRecord = maxByFn(historicalRecords, (record) =>
-  //       record.record_datetime.valueOf()
-  //     );
+      const mostRecentHistoricalRecord = maxByFn(historicalRecords, (record) =>
+        record.record_datetime.valueOf()
+      );
 
-  //     if (
-  //       historicalRecords.length === 0 ||
-  //       mostRecentHistoricalRecord === undefined
-  //     ) {
-  //       // if there are no historical records, don't display anything--trying to render with
-  //       // no historical records will cause issues with the graph and the change over time stats
-  //       component = (
-  //         <h2 className="text-2xl">No data found, try again later.</h2>
-  //       );
-  //       break;
-  //     }
+      if (
+        historicalRecords.length === 0 ||
+        mostRecentHistoricalRecord === undefined
+      ) {
+        // if there are no historical records, don't display anything--trying to render with
+        // no historical records will cause issues with the graph and the change over time stats
+        component = (
+          <h2 className="text-2xl">No data found, try again later.</h2>
+        );
+        break;
+      }
 
-  //     // displays a successfully loaded library (e.g., historical records were found, and
-  //     // probably forecast too, but this it not required--it will display fine without
-  //     // forecasts)
-  //     component = (
-  //       <LoadedLibraryComponent
-  //         historicalRecords={historicalRecords}
-  //         forecastRecords={forecastRecords}
-  //         mostRecentHistoricalRecord={mostRecentHistoricalRecord}
-  //         library={library}
-  //         now={now}
-  //       />
-  //     );
-  //   }
-  // }
+      // displays a successfully loaded library (e.g., historical records were found, and
+      // probably forecast too, but this it not required--it will display fine without
+      // forecasts)
+      component = (
+        <LoadedLibraryComponent
+          historicalRecords={historicalRecords}
+          forecastRecords={forecastRecords}
+          mostRecentHistoricalRecord={mostRecentHistoricalRecord}
+          library={library}
+          now={now}
+        />
+      );
+    }
+  }
 
   // display the header with the corresponding component--loading, loaded, or error
   return (
