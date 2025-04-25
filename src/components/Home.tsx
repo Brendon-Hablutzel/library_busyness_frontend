@@ -1,10 +1,21 @@
-import { useEffect, useState } from 'react'
-import { BusynessData, fetchHillRecords, fetchHuntRecords, ResponseStatus } from '../utils/backend'
-import { BusynessAreaChart, DisplayType } from './Charts'
-import { capitalize, getNearestItemByFn, maxByFn, nDaysBefore, nHoursAfter } from '../utils'
-import { Toggle } from './Toggle'
-import { ForecastRecord, HistoricalRecord, Library } from '../utils/models'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from "react";
+import {
+  BusynessData,
+  fetchHillRecords,
+  fetchHuntRecords,
+  ResponseStatus,
+} from "../utils/backend";
+import { BusynessAreaChart, DisplayType } from "./Charts";
+import {
+  capitalize,
+  getNearestItemByFn,
+  maxByFn,
+  nDaysBefore,
+  nHoursAfter,
+} from "../utils";
+import { Toggle } from "./Toggle";
+import { ForecastRecord, HistoricalRecord, Library } from "../utils/models";
+import { Link } from "react-router-dom";
 
 // component for the main page to display while data is being fetched
 const LoadingLibraryComponent: React.FC = () => {
@@ -25,22 +36,30 @@ const LoadingLibraryComponent: React.FC = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 // component that displays fetched data, including charts,
 // for a library
 const LoadedLibraryComponent: React.FC<{
-  mostRecentHistoricalRecord: HistoricalRecord
-  historicalRecords: HistoricalRecord[]
-  forecastRecords: ForecastRecord[]
-  now: Date
-  library: Library
-}> = ({ mostRecentHistoricalRecord, historicalRecords, forecastRecords, now, library }) => {
+  mostRecentHistoricalRecord: HistoricalRecord;
+  historicalRecords: HistoricalRecord[];
+  forecastRecords: ForecastRecord[];
+  now: Date;
+  library: Library;
+}> = ({
+  mostRecentHistoricalRecord,
+  historicalRecords,
+  forecastRecords,
+  now,
+  library,
+}) => {
   // display type for the chart--whether to show counts or percents
-  const [displayType, setDisplayType] = useState<DisplayType>(DisplayType.COUNTS)
+  const [displayType, setDisplayType] = useState<DisplayType>(
+    DisplayType.COUNTS
+  );
 
-  const mostRecentCount = mostRecentHistoricalRecord.total.count
+  const mostRecentCount = mostRecentHistoricalRecord.total.count;
 
   // find the forecast record nearest to one hour in the future to compute
   // the expected change over the next hour
@@ -48,15 +67,17 @@ const LoadedLibraryComponent: React.FC<{
     forecastRecords,
     (forecast) => forecast.record_datetime.valueOf(),
     nHoursAfter(now, 1).valueOf()
-  )
+  );
 
   const nextHourCount =
-    nextHourRecord !== undefined ? nextHourRecord.forecasted_total.count : undefined
+    nextHourRecord !== undefined
+      ? nextHourRecord.forecasted_total.count
+      : undefined;
 
   const nextHourPercentChange =
     nextHourCount !== undefined
       ? Math.round((100 * (nextHourCount - mostRecentCount)) / mostRecentCount)
-      : undefined
+      : undefined;
 
   // find the historical record nearest to one day in the past to compute
   // the change from then to now
@@ -64,14 +85,15 @@ const LoadedLibraryComponent: React.FC<{
     historicalRecords,
     (record) => record.record_datetime.valueOf(),
     nDaysBefore(now, 1).valueOf()
-  )
+  );
 
-  const dayAgoCount = dayAgoRecord !== undefined ? dayAgoRecord.total.count : undefined
+  const dayAgoCount =
+    dayAgoRecord !== undefined ? dayAgoRecord.total.count : undefined;
 
   const lastDayPercentChange =
     dayAgoCount !== undefined
       ? Math.round((100 * (mostRecentCount - dayAgoCount)) / dayAgoCount)
-      : undefined
+      : undefined;
 
   return (
     <div>
@@ -83,36 +105,38 @@ const LoadedLibraryComponent: React.FC<{
           <h3 className="text-3xl md:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl">
             <span className="font-semibold">
               {Math.round(100 * mostRecentHistoricalRecord.total.percent)}%
-            </span>{' '}
+            </span>{" "}
             full
           </h3>
         </div>
         <div className="flex flex-col lg:flex-row lg:items-center gap-4 md:gap-4">
           <div
-            className={`bg-bg-medium p-1 lg:p-2 rounded-md shadow-lg border-l-8 ${nextHourPercentChange === undefined || nextHourPercentChange === 0 ? 'border-l-yellow-500' : nextHourPercentChange > 0 ? 'border-l-red-500' : 'border-l-green-500'}`}
+            className={`bg-bg-medium p-1 lg:p-2 rounded-md shadow-lg border-l-8 ${nextHourPercentChange === undefined || nextHourPercentChange === 0 ? "border-l-yellow-500" : nextHourPercentChange > 0 ? "border-l-red-500" : "border-l-green-500"}`}
           >
             <div className="text-lg md:text-3xl lg:text-xl xl:text-2xl 2xl:text-3xl lg:px-1 xl:px-2">
               <span
-                className={`font-semibold ${nextHourPercentChange === undefined || nextHourPercentChange === 0 ? 'text-yellow-500' : nextHourPercentChange > 0 ? 'text-red-500' : 'text-green-500'}`}
+                className={`font-semibold ${nextHourPercentChange === undefined || nextHourPercentChange === 0 ? "text-yellow-500" : nextHourPercentChange > 0 ? "text-red-500" : "text-green-500"}`}
               >
-                {nextHourPercentChange === undefined || nextHourPercentChange === 0
-                  ? 'no change'
-                  : `${nextHourPercentChange > 0 ? '↑' : '↓'} ${Math.abs(nextHourPercentChange)}%`}
-              </span>{' '}
+                {nextHourPercentChange === undefined ||
+                nextHourPercentChange === 0
+                  ? "no change"
+                  : `${nextHourPercentChange > 0 ? "↑" : "↓"} ${Math.abs(nextHourPercentChange)}%`}
+              </span>{" "}
               over the next hour
             </div>
           </div>
           <div
-            className={`bg-bg-medium p-1 lg:p-2 rounded-md shadow-lg border-l-8 ${lastDayPercentChange === undefined || lastDayPercentChange === 0 ? 'border-l-yellow-500' : lastDayPercentChange > 0 ? 'border-l-red-500' : 'border-l-green-500'}`}
+            className={`bg-bg-medium p-1 lg:p-2 rounded-md shadow-lg border-l-8 ${lastDayPercentChange === undefined || lastDayPercentChange === 0 ? "border-l-yellow-500" : lastDayPercentChange > 0 ? "border-l-red-500" : "border-l-green-500"}`}
           >
             <div className="text-lg md:text-3xl lg:text-xl xl:text-2xl 2xl:text-3xl lg:px-1 xl:px-2">
               <span
-                className={`font-semibold ${lastDayPercentChange === undefined || lastDayPercentChange === 0 ? 'text-yellow-500' : lastDayPercentChange > 0 ? 'text-red-500' : 'text-green-500'}`}
+                className={`font-semibold ${lastDayPercentChange === undefined || lastDayPercentChange === 0 ? "text-yellow-500" : lastDayPercentChange > 0 ? "text-red-500" : "text-green-500"}`}
               >
-                {lastDayPercentChange === undefined || lastDayPercentChange === 0
-                  ? 'no change'
-                  : `${lastDayPercentChange > 0 ? '↑' : '↓'} ${Math.abs(lastDayPercentChange)}%`}
-              </span>{' '}
+                {lastDayPercentChange === undefined ||
+                lastDayPercentChange === 0
+                  ? "no change"
+                  : `${lastDayPercentChange > 0 ? "↑" : "↓"} ${Math.abs(lastDayPercentChange)}%`}
+              </span>{" "}
               from yesterday at this time
             </div>
           </div>
@@ -135,51 +159,58 @@ const LoadedLibraryComponent: React.FC<{
           enabledText={DisplayType.PERCENTS}
           state={displayType === DisplayType.PERCENTS}
           setState={(newState) => {
-            setDisplayType(newState ? DisplayType.PERCENTS : DisplayType.COUNTS)
+            setDisplayType(
+              newState ? DisplayType.PERCENTS : DisplayType.COUNTS
+            );
           }}
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
 // component for displaying data for a single library
 const LibraryComponent: React.FC<{
-  library: Library
-  data: BusynessData
-  className: string
-  now: Date
+  library: Library;
+  data: BusynessData;
+  className: string;
+  now: Date;
 }> = ({ library, data, className, now }) => {
-  const { status } = data
-  const formattedLibrary = capitalize(library)
+  const { status } = data;
+  const formattedLibrary = capitalize(library);
 
   // default to the loading component, change it when the status changes
   // to either error or loaded
-  let component: React.ReactElement = <LoadingLibraryComponent />
+  let component: React.ReactElement = <LoadingLibraryComponent />;
 
   switch (status) {
     case ResponseStatus.ERROR: {
-      console.error(data.error)
+      console.error(data.error);
 
       component = (
         <h2 className="text-2xl text-red-500">
           Sorry, there was an error loading occupancy data. Please try again.
         </h2>
-      )
-      break
+      );
+      break;
     }
     case ResponseStatus.LOADED: {
-      const { historicalRecords, forecastRecords } = data
+      const { historicalRecords, forecastRecords } = data;
 
       const mostRecentHistoricalRecord = maxByFn(historicalRecords, (record) =>
         record.record_datetime.valueOf()
-      )
+      );
 
-      if (historicalRecords.length === 0 || mostRecentHistoricalRecord === undefined) {
+      if (
+        historicalRecords.length === 0 ||
+        mostRecentHistoricalRecord === undefined
+      ) {
         // if there are no historical records, don't display anything--trying to render with
         // no historical records will cause issues with the graph and the change over time stats
-        component = <h2 className="text-2xl">No data found, try again later.</h2>
-        break
+        component = (
+          <h2 className="text-2xl">No data found, try again later.</h2>
+        );
+        break;
       }
 
       // displays a successfully loaded library (e.g., historical records were found, and
@@ -193,7 +224,7 @@ const LibraryComponent: React.FC<{
           library={library}
           now={now}
         />
-      )
+      );
     }
   }
 
@@ -207,51 +238,51 @@ const LibraryComponent: React.FC<{
         {component}
       </div>
     </div>
-  )
-}
+  );
+};
 
 const Home: React.FC = () => {
-  const [now, setNow] = useState(new Date())
+  const [now, setNow] = useState(new Date());
 
   useEffect(() => {
     const interval = setInterval(
       () => {
         // setting now causes data to be re-fetched and library
         // components to be re-rendered
-        setNow(new Date())
+        setNow(new Date());
       },
       // every 5 minutes
       1000 * 60 * 5
-    )
+    );
 
-    return () => clearInterval(interval)
-  }, [now])
+    return () => clearInterval(interval);
+  }, [now]);
 
   // fetch hill data on component render and whenever 'now' updates
   const [hillDataResponse, setHillDataResponse] = useState<BusynessData>({
     status: ResponseStatus.LOADING,
-  })
+  });
 
   useEffect(() => {
-    ;(async () => {
-      const hillDataResponse = await fetchHillRecords(nDaysBefore(now, 7))
+    (async () => {
+      const hillDataResponse = await fetchHillRecords(nDaysBefore(now, 7));
 
-      setHillDataResponse(hillDataResponse)
-    })()
-  }, [now])
+      setHillDataResponse(hillDataResponse);
+    })();
+  }, [now]);
 
   // fetch hunt data on component render and whenever 'now' updates
   const [huntDataResponse, setHuntDataResponse] = useState<BusynessData>({
     status: ResponseStatus.LOADING,
-  })
+  });
 
   useEffect(() => {
-    ;(async () => {
-      const huntDataResponse = await fetchHuntRecords(nDaysBefore(now, 7))
+    (async () => {
+      const huntDataResponse = await fetchHuntRecords(nDaysBefore(now, 7));
 
-      setHuntDataResponse(huntDataResponse)
-    })()
-  }, [now])
+      setHuntDataResponse(huntDataResponse);
+    })();
+  }, [now]);
 
   return (
     <div className="min-h-[100vh] bg-bg-darkest text-text-light">
@@ -261,8 +292,8 @@ const Home: React.FC = () => {
             NC State Library Busyness
           </h1>
           <p className="mt-2 max-w-4xl text-sm sm:text-base md:text-lg text-text-light/85">
-            view recent, current, and forecasted busyness for NC State's libraries — updated every
-            15 minutes
+            view recent, current, and forecasted busyness for NC State's
+            libraries — updated every 15 minutes
           </p>
         </div>
         <LibraryComponent
@@ -278,7 +309,7 @@ const Home: React.FC = () => {
           className="max-w-[100vw]"
         />
         <div className="flex items-center gap-2 justify-center text-center py-8 px-2 text-sm sm:text-lg md:text-xl">
-          <span>data from {now.toLocaleString()}</span> <span>•</span>{' '}
+          <span>data from {now.toLocaleString()}</span> <span>•</span>{" "}
           <span>
             <Link to="/about" target="_blank">
               learn more
@@ -287,7 +318,7 @@ const Home: React.FC = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;
