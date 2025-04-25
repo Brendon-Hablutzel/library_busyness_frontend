@@ -10,67 +10,64 @@ import {
   TooltipProps,
   XAxis,
   YAxis,
-} from "recharts";
-import { formatPercent, nMinutesAfter, padOneZero, reverse } from "./utils";
-import {
-  NameType,
-  ValueType,
-} from "recharts/types/component/DefaultTooltipContent";
-import { scaleTime } from "d3-scale";
+} from 'recharts'
+import { formatPercent, nMinutesAfter, padOneZero, reverse } from './utils'
+import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent'
+import { scaleTime } from 'd3-scale'
 import {
   ForecastRecord,
   HistoricalRecord,
   Library,
   libraryAreas,
   MetricsRecord,
-} from "./utils/models";
+} from './utils/models'
 
 // a constant that affects how the number of data points shown on the
 // busyness area chart will change between screen sizes. Higher means that
 // each data point occupies a greater portion of the screen, so fewer will
 // be shown on smaller screens.
-const MIN_DATAPOINT_WIDTH = 2;
+const MIN_DATAPOINT_WIDTH = 2
 
 export enum DisplayType {
-  COUNTS = "count",
-  PERCENTS = "percent",
+  COUNTS = 'count',
+  PERCENTS = 'percent',
 }
 
 // return a simple formatted timestamp, with day of week name, month, day,
 // hour, and minute--used for ticks on the charts below
 const formatTimestampSimple = (epochTimestampMillis: number) => {
-  const when = new Date(epochTimestampMillis);
-  const dayOfWeekName = when.toLocaleString("default", { weekday: "short" });
-  return `${dayOfWeekName} ${when.getMonth() + 1}/${when.getDate()} ${padOneZero(when.getHours())}:${padOneZero(when.getMinutes())}`;
-};
+  const when = new Date(epochTimestampMillis)
+  const dayOfWeekName = when.toLocaleString('default', { weekday: 'short' })
+  return `${dayOfWeekName} ${when.getMonth() + 1}/${when.getDate()} ${padOneZero(when.getHours())}:${padOneZero(when.getMinutes())}`
+}
 
 // return a more complete formatted timestamp, including year, month, day,
 // hour, minutes, and seconds--used for the tooltip
 const formatTimestampFull = (epochTimestampMillis: number) => {
-  const when = new Date(epochTimestampMillis);
-  return when.toLocaleString();
-};
+  const when = new Date(epochTimestampMillis)
+  return when.toLocaleString()
+}
 
 // colors for the "counts" version of the chart
 const graphColorsCounts = [
-  "#589dd6", // blues:
-  "#87CEEB",
-  "#1E90FF",
-  "#1ca9d9",
-];
+  '#589dd6', // blues:
+  '#87CEEB',
+  '#1E90FF',
+  '#1ca9d9',
+]
 
 const getGraphColorCounts = (idx: number): string => {
-  return graphColorsCounts[idx % graphColorsCounts.length];
-};
+  return graphColorsCounts[idx % graphColorsCounts.length]
+}
 
 // colors for the "percents" version of the chart
 const graphColorsPercent = [
-  "#e3a02d", // soft orange
-];
+  '#e3a02d', // soft orange
+]
 
 const getGraphColorPercent = (idx: number): string => {
-  return graphColorsPercent[idx % graphColorsPercent.length];
-};
+  return graphColorsPercent[idx % graphColorsPercent.length]
+}
 
 const CustomTooltip: React.FC<TooltipProps<ValueType, NameType>> = ({
   active,
@@ -78,43 +75,39 @@ const CustomTooltip: React.FC<TooltipProps<ValueType, NameType>> = ({
   label,
 }: TooltipProps<ValueType, NameType>) => {
   if (active && payload && payload.length > 0) {
-    payload = reverse(payload);
+    payload = reverse(payload)
     return (
       <div className="bg-bg-dark rounded-md p-2 bg-opacity-75">
         <h2 className="font-semibold">{formatTimestampFull(label)}</h2>
         {payload.map((series, idx) => {
-          const color = series.color
-            ? `text-[${series.color}]`
-            : "text-text-light";
+          const color = series.color ? `text-[${series.color}]` : 'text-text-light'
 
-          const name = series.name?.toString() ?? "";
+          const name = series.name?.toString() ?? ''
 
           return (
             <div className={color} key={idx}>
-              <span className="font-light">{name}:</span>{" "}
+              <span className="font-light">{name}:</span>{' '}
               <span className="font-medium">
-                {name.includes("percent")
-                  ? formatPercent(series.value as number)
-                  : series.value}
+                {name.includes('percent') ? formatPercent(series.value as number) : series.value}
               </span>
             </div>
-          );
+          )
         })}
       </div>
-    );
+    )
   }
 
-  return null;
-};
+  return null
+}
 
 // the chart to display for each library on the main page--includes historical records
 // and forecasts
 interface BusynessAreaChartProps {
-  library: Library;
-  historicalRecords: HistoricalRecord[];
-  forecastRecords: ForecastRecord[];
-  displayType: DisplayType;
-  now: Date;
+  library: Library
+  historicalRecords: HistoricalRecord[]
+  forecastRecords: ForecastRecord[]
+  displayType: DisplayType
+  now: Date
 }
 
 export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
@@ -130,15 +123,13 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
     // data is re-fetched in the background
     window.innerWidth / MIN_DATAPOINT_WIDTH,
     historicalRecords.length
-  );
+  )
 
-  const selectedHistoricalRecords = historicalRecords.slice(
-    -numSelectedHistoricalRecords
-  );
+  const selectedHistoricalRecords = historicalRecords.slice(-numSelectedHistoricalRecords)
 
-  const data = [...selectedHistoricalRecords, ...forecastRecords];
+  const data = [...selectedHistoricalRecords, ...forecastRecords]
 
-  const areas = libraryAreas[library];
+  const areas = libraryAreas[library]
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -148,7 +139,7 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
           dataKey="record_datetime"
-          tick={{ fill: "#d4d4d4" }}
+          tick={{ fill: '#d4d4d4' }}
           tickFormatter={formatTimestampSimple}
           tickMargin={15}
           angle={-55}
@@ -161,12 +152,12 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
           scale={scaleTime()}
         />
         <YAxis
-          tick={{ fill: "#d4d4d4" }}
+          tick={{ fill: '#d4d4d4' }}
           domain={displayType === DisplayType.PERCENTS ? [0, 1] : undefined}
           tickFormatter={
             displayType === DisplayType.PERCENTS
               ? (tick) => {
-                  return formatPercent(tick);
+                  return formatPercent(tick)
                 }
               : undefined
           }
@@ -208,7 +199,7 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
                 stackId="1"
                 animationDuration={500}
               />
-            );
+            )
           })
         ) : (
           <div></div>
@@ -219,14 +210,10 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
           name={`forecasted total ${displayType}`}
           dataKey={`forecasted_total.${displayType}`}
           fill={
-            displayType === DisplayType.COUNTS
-              ? getGraphColorCounts(0)
-              : getGraphColorPercent(1)
+            displayType === DisplayType.COUNTS ? getGraphColorCounts(0) : getGraphColorPercent(1)
           }
           stroke={
-            displayType === DisplayType.COUNTS
-              ? getGraphColorCounts(0)
-              : getGraphColorPercent(1)
+            displayType === DisplayType.COUNTS ? getGraphColorCounts(0) : getGraphColorPercent(1)
           }
           animationDuration={500}
           fillOpacity={0.3}
@@ -243,14 +230,12 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
         {/* <Brush startIndex={100} /> */}
       </ComposedChart>
     </ResponsiveContainer>
-  );
-};
+  )
+}
 
 // the chart to display for each library on the metrics page--shows actual
 // total count and predicted total count
-export const ForecastMetricsChart: React.FC<{ records: MetricsRecord[] }> = ({
-  records,
-}) => {
+export const ForecastMetricsChart: React.FC<{ records: MetricsRecord[] }> = ({ records }) => {
   return (
     <ResponsiveContainer width="100%" height="100%">
       {/* margin is so that rotated ticks don't get cut off */}
@@ -259,7 +244,7 @@ export const ForecastMetricsChart: React.FC<{ records: MetricsRecord[] }> = ({
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
           dataKey="record_datetime"
-          tick={{ fill: "#d4d4d4" }}
+          tick={{ fill: '#d4d4d4' }}
           tickFormatter={formatTimestampSimple}
           tickMargin={15}
           angle={-55}
@@ -272,7 +257,7 @@ export const ForecastMetricsChart: React.FC<{ records: MetricsRecord[] }> = ({
           scale={scaleTime()}
           height={110}
         />
-        <YAxis tick={{ fill: "#d4d4d4" }} />
+        <YAxis tick={{ fill: '#d4d4d4' }} />
         <Area
           name="actual total count"
           dataKey="total.count.actual"
@@ -292,5 +277,5 @@ export const ForecastMetricsChart: React.FC<{ records: MetricsRecord[] }> = ({
         <Brush travellerWidth={10} gap={5} height={25} />
       </ComposedChart>
     </ResponsiveContainer>
-  );
-};
+  )
+}
