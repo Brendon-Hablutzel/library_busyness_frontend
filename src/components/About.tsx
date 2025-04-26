@@ -1,6 +1,9 @@
+import { useState } from 'react'
 import busynessGraph from '../assets/busyness-graph.png'
 
 const About = () => {
+  const [busynessGraphLoaded, setBusynessGraphLoaded] = useState(false)
+
   return (
     <div className="min-h-[100vh] bg-bg-darkest text-text-light flex justify-center">
       <div className="flex flex-col justify-between gap-10 lg:gap-12 p-4 lg:p-6 w-[100%] max-w-[1200px] mb-24">
@@ -88,10 +91,13 @@ const About = () => {
               increase for the next few days, peak on Wednesday, then decrease again.
             </div>
             <div className="flex flex-col items-center justify-center gap-3">
+              {!busynessGraphLoaded ? <div className="w-[750px] h-[323px]"></div> : null}
+              {/* dimensions: 1627 × 701 */}
               <img
                 src={busynessGraph}
                 width={750}
                 alt="Graph showing recorded busyness from Fall 2023 to Spring 2025"
+                onLoad={() => setBusynessGraphLoaded(true)}
               />
               <div className="text-center text-sm">
                 Graph showing recorded busyness from Fall 2023 to Spring 2025
