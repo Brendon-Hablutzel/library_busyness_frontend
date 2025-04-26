@@ -9,11 +9,7 @@ export default defineConfig(({ mode }) => {
     // base: "/library_busyness_frontend",
     plugins: [react()],
     define: {
-      'process.env.REACT_APP_HISTORICAL_RECORDS_API_URL': JSON.stringify(
-        env.REACT_APP_HISTORICAL_RECORDS_API_URL
-      ),
-      'process.env.REACT_APP_FORECASTS_API_URL': JSON.stringify(env.REACT_APP_FORECASTS_API_URL),
-      'process.env.REACT_APP_METRICS_API_URL': JSON.stringify(env.REACT_APP_METRICS_API_URL),
+      'process.env.REACT_APP_API_URL': JSON.stringify(env.REACT_APP_API_URL),
     },
     css: {
       postcss: {
