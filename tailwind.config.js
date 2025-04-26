@@ -18,13 +18,6 @@ export default {
         // horizontal offset, vertical offset, blur radius, spread radius, color
         maincard: '0.1em 0.3em 0.5em 0.3em rgb(0,0,0,0.25)',
       },
-      keyframes: {
-        'grow-shrink': {
-          '0%': { transform: 'scale(0.5)' },
-          '50%': { transform: 'scale(1)' },
-          '100%': { transform: 'scale(0.5)' },
-        },
-      },
     },
   },
   // these are for graph/tooltip colors because the tooltip
