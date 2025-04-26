@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { formatPercent, nMinutesAfter, padOneZero, reverse } from './utils'
+import { formatPercent, nMinutesAfter, padOneZero, reverse } from '../utils'
 import { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent'
 import { scaleTime } from 'd3-scale'
 import {
@@ -20,7 +20,7 @@ import {
   Library,
   libraryAreas,
   MetricsRecord,
-} from './utils/models'
+} from '../utils/models'
 
 // a constant that affects how the number of data points shown on the
 // busyness area chart will change between screen sizes. Higher means that

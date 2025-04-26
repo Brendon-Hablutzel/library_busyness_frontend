@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { BusynessData, fetchHillRecords, fetchHuntRecords, ResponseStatus } from './utils/backend'
+import { BusynessData, fetchHillRecords, fetchHuntRecords, ResponseStatus } from '../utils/backend'
 import { BusynessAreaChart, DisplayType } from './Charts'
-import { capitalize, getNearestItemByFn, maxByFn, nDaysBefore, nHoursAfter } from './utils'
+import { capitalize, getNearestItemByFn, maxByFn, nDaysBefore, nHoursAfter } from '../utils'
 import { Toggle } from './Toggle'
-import { ForecastRecord, HistoricalRecord, Library } from './utils/models'
+import { ForecastRecord, HistoricalRecord, Library } from '../utils/models'
+import { Link } from 'react-router-dom'
 
 // component for the main page to display while data is being fetched
 const LoadingLibraryComponent: React.FC = () => {
@@ -77,10 +78,10 @@ const LoadedLibraryComponent: React.FC<{
       <div className="lg:flex lg:justify-between pb-4">
         <div className="flex justify-between items-center flex-row lg:gap-5 xl:gap-10 2xl:gap-15 mb-4 lg:mb-0">
           <h3 className="text-3xl md:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl">
-            <span className="font-semibold">{mostRecentCount}</span> people
+            <span className="font-medium">{mostRecentCount}</span> people
           </h3>
           <h3 className="text-3xl md:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl">
-            <span className="font-semibold">
+            <span className="font-medium">
               {Math.round(100 * mostRecentHistoricalRecord.total.percent)}%
             </span>{' '}
             full
@@ -92,11 +93,11 @@ const LoadedLibraryComponent: React.FC<{
           >
             <div className="text-lg md:text-3xl lg:text-xl xl:text-2xl 2xl:text-3xl lg:px-1 xl:px-2">
               <span
-                className={`font-semibold ${nextHourPercentChange === undefined || nextHourPercentChange === 0 ? 'text-yellow-500' : nextHourPercentChange > 0 ? 'text-red-500' : 'text-green-500'}`}
+                className={`font-medium ${nextHourPercentChange === undefined || nextHourPercentChange === 0 ? 'text-yellow-500' : nextHourPercentChange > 0 ? 'text-red-500' : 'text-green-500'}`}
               >
                 {nextHourPercentChange === undefined || nextHourPercentChange === 0
                   ? 'no change'
-                  : `${nextHourPercentChange > 0 ? '⇧' : '⇩'} ${Math.abs(nextHourPercentChange)}%`}
+                  : `${nextHourPercentChange > 0 ? '↑' : '↓'} ${Math.abs(nextHourPercentChange)}%`}
               </span>{' '}
               over the next hour
             </div>
@@ -106,11 +107,11 @@ const LoadedLibraryComponent: React.FC<{
           >
             <div className="text-lg md:text-3xl lg:text-xl xl:text-2xl 2xl:text-3xl lg:px-1 xl:px-2">
               <span
-                className={`font-semibold ${lastDayPercentChange === undefined || lastDayPercentChange === 0 ? 'text-yellow-500' : lastDayPercentChange > 0 ? 'text-red-500' : 'text-green-500'}`}
+                className={`font-medium ${lastDayPercentChange === undefined || lastDayPercentChange === 0 ? 'text-yellow-500' : lastDayPercentChange > 0 ? 'text-red-500' : 'text-green-500'}`}
               >
                 {lastDayPercentChange === undefined || lastDayPercentChange === 0
                   ? 'no change'
-                  : `${lastDayPercentChange > 0 ? '⇧' : '⇩'} ${Math.abs(lastDayPercentChange)}%`}
+                  : `${lastDayPercentChange > 0 ? '↑' : '↓'} ${Math.abs(lastDayPercentChange)}%`}
               </span>{' '}
               from yesterday at this time
             </div>
@@ -255,10 +256,14 @@ const Home: React.FC = () => {
   return (
     <div className="min-h-[100vh] bg-bg-darkest text-text-light">
       <div className="flex flex-col justify-between gap-4 lg:gap-6 p-4 lg:p-6">
-        <div className="flex justify-center items-center">
+        <div className="flex flex-col items-center text-center text-text-light">
           <h1 className="sm:py-2 lg:p-0 font-bold filter drop-shadow-header text-2xl sm:text-4xl 2xl:text-5xl text-center">
             NC State Library Busyness
           </h1>
+          <p className="mt-2 max-w-4xl text-sm sm:text-base md:text-lg text-text-light/85">
+            view recent, current, and forecasted busyness for NC State's libraries — updated every
+            15 minutes
+          </p>
         </div>
         <LibraryComponent
           library="hill"
@@ -272,8 +277,13 @@ const Home: React.FC = () => {
           now={now}
           className="max-w-[100vw]"
         />
-        <div className="flex flex-col justify-center text-center py-8 px-2 text-sm sm:text-lg md:text-xl">
-          <div>Last checked for new data at {now.toLocaleString()}</div>
+        <div className="flex items-center gap-2 justify-center text-center py-8 px-2 text-sm sm:text-lg md:text-xl">
+          <span>data from {now.toLocaleString()}</span> <span>•</span>{' '}
+          <span>
+            <Link to="/about" target="_blank" className="hover:underline underline-offset-2">
+              learn more
+            </Link>
+          </span>
         </div>
       </div>
     </div>

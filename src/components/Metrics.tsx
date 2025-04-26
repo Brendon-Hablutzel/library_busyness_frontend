@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { fetchMetrics, MetricsData, ResponseStatus } from './utils/backend'
-import { capitalize, nWeeksBefore } from './utils'
+import { fetchMetrics, MetricsData, ResponseStatus } from '../utils/backend'
+import { capitalize, nWeeksBefore } from '../utils'
 import { ForecastMetricsChart } from './Charts'
-import { LibraryMetrics } from './utils/models'
+import { LibraryMetrics } from '../utils/models'
 
 // the number of prior weeks to show metrics for
 const METRICS_PRIOR_WEEKS = 4
