@@ -22,18 +22,26 @@ const About = () => {
             <div className="leading-relaxed text-lg text-justify">
               All data is sourced from the technology powering the real-time occupancy reporting
               websites for{' '}
-              <a href="https://www.lib.ncsu.edu/busy-hill" target="_blank" className="underline">
+              <a
+                href="https://www.lib.ncsu.edu/busy-hill"
+                target="_blank"
+                className="underline underline-offset-2"
+              >
                 Hill
               </a>{' '}
               and{' '}
-              <a href="https://www.lib.ncsu.edu/busy-hill" target="_blank" className="underline">
+              <a
+                href="https://www.lib.ncsu.edu/busy-hill"
+                target="_blank"
+                className="underline underline-offset-2"
+              >
                 Hunt
               </a>{' '}
               libraries—you can learn more about how that data is collected{' '}
               <a
                 href="https://www.lib.ncsu.edu/privacy#occuspace"
                 target="_blank"
-                className="underline"
+                className="underline underline-offset-2"
               >
                 here
               </a>
@@ -70,7 +78,7 @@ const About = () => {
                 <a
                   href="https://www.lib.ncsu.edu/space-occupancy/realtime-data.php?id=266&library=hill"
                   target="_blank"
-                  className="underline"
+                  className="underline underline-offset-2"
                 >
                   this
                 </a>{' '}
@@ -106,7 +114,11 @@ const About = () => {
             <div className="leading-relaxed text-lg text-justify">
               To make predictions based on the extensive stored history of busyness data, this
               system uses an open source time series forecasting machine learning model called{' '}
-              <a href="https://facebook.github.io/prophet/" target="_blank" className="underline">
+              <a
+                href="https://facebook.github.io/prophet/"
+                target="_blank"
+                className="underline underline-offset-2"
+              >
                 Prophet
               </a>
               . Prophet is designed to handle time series data that exhibits seasonality (regular,

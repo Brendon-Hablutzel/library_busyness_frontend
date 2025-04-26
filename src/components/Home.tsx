@@ -279,8 +279,8 @@ const Home: React.FC = () => {
         />
         <div className="flex items-center gap-2 justify-center text-center py-8 px-2 text-sm sm:text-lg md:text-xl">
           <span>data from {now.toLocaleString()}</span> <span>•</span>{' '}
-          <span className="hover:underline">
-            <Link to="/about" target="_blank">
+          <span>
+            <Link to="/about" target="_blank" className="hover:underline underline-offset-2">
               learn more
             </Link>
           </span>
