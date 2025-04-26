@@ -4,38 +4,18 @@ import { ForecastRecord, HistoricalRecord, Library, LibraryMetrics, SummaryMetri
 // and these URLs can be configured via environment variables.
 // these should be provided on the deployment platform
 
-const HISTORICAL_RECORDS_API_URL = process.env.REACT_APP_HISTORICAL_RECORDS_API_URL
-
-const FORECASTS_API_URL = process.env.REACT_APP_FORECASTS_API_URL
-
-const METRICS_API_URL = process.env.REACT_APP_METRICS_API_URL
+const API_URL = process.env.REACT_APP_API_URL
 
 // below are functions that encapsulate logic for retrieving and generating
 // backend URLs for various APIs. in case of future changes to the API route
 // structure, these should be all that needs to be changed
 
-export const getHistoricalRecordsUrl = (library: 'hill' | 'hunt', since?: Date): string => {
-  if (!HISTORICAL_RECORDS_API_URL) {
-    console.error('REACT_APP_HISTORICAL_RECORDS_API_URL environment variable is not defined')
+export const getApiUrl = (): string => {
+  if (!API_URL) {
+    throw new Error('REACT_APP_API_URL environment variable is not defined')
   }
 
-  return `${HISTORICAL_RECORDS_API_URL}/?library=${library}${since ? `&since=${since.valueOf()}` : ''}`
-}
-
-export const getForecastsUrl = (library: 'hill' | 'hunt', since?: Date): string => {
-  if (!FORECASTS_API_URL) {
-    console.error('REACT_APP_FORECASTS_API_URL environment variable is not defined')
-  }
-
-  return `${FORECASTS_API_URL}/?library=${library}${since ? `&since=${since.valueOf()}` : ''}`
-}
-
-export const getMetricsUrl = (since: Date) => {
-  if (!METRICS_API_URL) {
-    console.error('REACT_APP_METRICS_API_URL environment variable is not defined')
-  }
-
-  return `${METRICS_API_URL}/?since=${since.valueOf()}`
+  return API_URL
 }
 
 // possible states that a request for data can be in
@@ -127,7 +107,9 @@ export type BusynessData =
 // fetches historical and forecast records for hill from the backend
 export const fetchHillRecords = async (since: Date): Promise<BusynessData> => {
   try {
-    const historicalResponse = await fetch(getHistoricalRecordsUrl('hill', since))
+    const historicalResponse = await fetch(
+      `${getApiUrl()}/historical/hill?since=${since.getTime()}`
+    )
     // unchecked cast
     const historicalBody =
       (await historicalResponse.json()) as HistoricalBackendResponse<BackendHillHistoricalRecord>
@@ -138,34 +120,34 @@ export const fetchHillRecords = async (since: Date): Promise<BusynessData> => {
 
     // reformat historical records and convert milliseconds epoch timestamps to
     // native Date
-    const historicalRecords: HistoricalRecord[] = (historicalBody.busynessRecords ?? []).map(
-      (record) => {
-        return {
-          active: record.active,
-          record_datetime: new Date(record.record_datetime),
-          total: {
-            count: record.total_count,
-            percent: record.total_percent,
+    const historicalRecords = (historicalBody.busynessRecords ?? []).map((record) => {
+      return {
+        active: record.active,
+        record_datetime: new Date(record.record_datetime),
+        total: {
+          count: record.total_count,
+          percent: record.total_percent,
+        },
+        areas: {
+          east: {
+            count: record.east_count,
+            percent: record.east_percent,
           },
-          areas: {
-            east: {
-              count: record.east_count,
-              percent: record.east_percent,
-            },
-            tower: {
-              count: record.tower_count,
-              percent: record.tower_percent,
-            },
-            west: {
-              count: record.west_count,
-              percent: record.west_percent,
-            },
+          tower: {
+            count: record.tower_count,
+            percent: record.tower_percent,
           },
-        }
+          west: {
+            count: record.west_count,
+            percent: record.west_percent,
+          },
+        },
       }
-    )
+    })
 
-    const forecastResponse = await fetch(getForecastsUrl('hill', new Date()))
+    const forecastResponse = await fetch(
+      `${getApiUrl()}/forecast/hill?since=${new Date().getTime()}`
+    )
     // unchecked cast
     const forecastBody =
       (await forecastResponse.json()) as ForecastBackendResponse<BackendHillForecastRecord>
@@ -176,18 +158,16 @@ export const fetchHillRecords = async (since: Date): Promise<BusynessData> => {
 
     // reformat forecast records, convert millisecond epoch timestamps to native
     // Date, and ensure that all predictions are at least 0
-    const forecastRecords: ForecastRecord[] = (forecastBody.busynessForecastRecords ?? []).map(
-      (forecast) => {
-        return {
-          ...forecast,
-          record_datetime: new Date(forecast.record_datetime),
-          forecasted_total: {
-            count: Math.max(0, forecast.total_count),
-            percent: Math.max(0, forecast.total_percent),
-          },
-        }
+    const forecastRecords = (forecastBody.busynessForecastRecords ?? []).map((forecast) => {
+      return {
+        ...forecast,
+        record_datetime: new Date(forecast.record_datetime),
+        forecasted_total: {
+          count: Math.max(0, forecast.total_count),
+          percent: Math.max(0, forecast.total_percent),
+        },
       }
-    )
+    })
 
     return {
       status: ResponseStatus.LOADED,
@@ -205,7 +185,9 @@ export const fetchHillRecords = async (since: Date): Promise<BusynessData> => {
 // fetches historical and forecast records for hunt from the backend
 export const fetchHuntRecords = async (since: Date): Promise<BusynessData> => {
   try {
-    const historicalResponse = await fetch(getHistoricalRecordsUrl('hunt', since))
+    const historicalResponse = await fetch(
+      `${getApiUrl()}/historical/hunt?since=${since.getTime()}`
+    )
     // unchecked cast
     const historicalBody =
       (await historicalResponse.json()) as HistoricalBackendResponse<BackendHuntHistoricalRecord>
@@ -214,38 +196,38 @@ export const fetchHuntRecords = async (since: Date): Promise<BusynessData> => {
       throw new Error('server was unable to process the request for historical records')
     }
 
-    const historicalRecords: HistoricalRecord[] = (historicalBody.busynessRecords ?? []).map(
-      (record) => {
-        return {
-          active: record.active,
-          record_datetime: new Date(record.record_datetime),
-          total: {
-            count: record.total_count,
-            percent: record.total_percent,
+    const historicalRecords = (historicalBody.busynessRecords ?? []).map((record) => {
+      return {
+        active: record.active,
+        record_datetime: new Date(record.record_datetime),
+        total: {
+          count: record.total_count,
+          percent: record.total_percent,
+        },
+        areas: {
+          level2: {
+            count: record.level2_count,
+            percent: record.level2_percent,
           },
-          areas: {
-            level2: {
-              count: record.level2_count,
-              percent: record.level2_percent,
-            },
-            level3: {
-              count: record.level3_count,
-              percent: record.level3_percent,
-            },
-            level4: {
-              count: record.level4_count,
-              percent: record.level4_percent,
-            },
-            level5: {
-              count: record.level5_count,
-              percent: record.level5_percent,
-            },
+          level3: {
+            count: record.level3_count,
+            percent: record.level3_percent,
           },
-        }
+          level4: {
+            count: record.level4_count,
+            percent: record.level4_percent,
+          },
+          level5: {
+            count: record.level5_count,
+            percent: record.level5_percent,
+          },
+        },
       }
-    )
+    })
 
-    const forecastResponse = await fetch(getForecastsUrl('hunt', new Date()))
+    const forecastResponse = await fetch(
+      `${getApiUrl()}/forecast/hunt?since=${new Date().getTime()}`
+    )
     // unchecked cast
     const forecastBody =
       (await forecastResponse.json()) as ForecastBackendResponse<BackendHuntForecastRecord>
@@ -254,18 +236,16 @@ export const fetchHuntRecords = async (since: Date): Promise<BusynessData> => {
       throw new Error('server was unable to process the request for forecast records')
     }
 
-    const forecastRecords: ForecastRecord[] = (forecastBody.busynessForecastRecords ?? []).map(
-      (forecast) => {
-        return {
-          ...forecast,
-          record_datetime: new Date(forecast.record_datetime),
-          forecasted_total: {
-            count: Math.max(0, forecast.total_count),
-            percent: Math.max(0, forecast.total_percent),
-          },
-        }
+    const forecastRecords = (forecastBody.busynessForecastRecords ?? []).map((forecast) => {
+      return {
+        ...forecast,
+        record_datetime: new Date(forecast.record_datetime),
+        forecasted_total: {
+          count: Math.max(0, forecast.total_count),
+          percent: Math.max(0, forecast.total_percent),
+        },
       }
-    )
+    })
 
     return {
       status: ResponseStatus.LOADED,
@@ -314,7 +294,7 @@ export type MetricsData =
 // fetches forecast metrics from the backend (NOTE: this includes both libraries)
 export const fetchMetrics = async (since: Date): Promise<MetricsData> => {
   try {
-    const metricsResponse = await fetch(getMetricsUrl(since))
+    const metricsResponse = await fetch(`${getApiUrl()}/metrics?since=${since.getTime()}`)
     // unchecked cast
     const metricsBody = (await metricsResponse.json()) as MetricsBackendResponse
 

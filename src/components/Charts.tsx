@@ -185,25 +185,23 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
           />
         )}
 
-        {displayType === DisplayType.COUNTS ? (
-          areas.map((area, idx) => {
-            return (
-              <Area
-                type="monotone"
-                name={`${area} ${displayType}`}
-                dataKey={`areas.${area}.${displayType}`}
-                key={idx}
-                fill={getGraphColorCounts(idx + 1)}
-                stroke={getGraphColorCounts(idx + 1)}
-                fillOpacity={0.7}
-                stackId="1"
-                animationDuration={500}
-              />
-            )
-          })
-        ) : (
-          <div></div>
-        )}
+        {displayType === DisplayType.COUNTS
+          ? areas.map((area, idx) => {
+              return (
+                <Area
+                  type="monotone"
+                  name={`${area} ${displayType}`}
+                  dataKey={`areas.${area}.${displayType}`}
+                  key={idx}
+                  fill={getGraphColorCounts(idx + 1)}
+                  stroke={getGraphColorCounts(idx + 1)}
+                  fillOpacity={0.7}
+                  stackId="1"
+                  animationDuration={500}
+                />
+              )
+            })
+          : null}
 
         <Area
           type="monotone"
@@ -254,6 +252,7 @@ export const ForecastMetricsChart: React.FC<{ records: MetricsRecord[] }> = ({ r
           fontSize={15}
           // this ensures that spacing between data points is proportional
           // to the duration between those data points
+          // TODO: this isn't support anymore
           scale={scaleTime()}
           height={110}
         />
