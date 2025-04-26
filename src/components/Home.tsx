@@ -78,10 +78,10 @@ const LoadedLibraryComponent: React.FC<{
       <div className="lg:flex lg:justify-between pb-4">
         <div className="flex justify-between items-center flex-row lg:gap-5 xl:gap-10 2xl:gap-15 mb-4 lg:mb-0">
           <h3 className="text-3xl md:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl">
-            <span className="font-semibold">{mostRecentCount}</span> people
+            <span className="font-medium">{mostRecentCount}</span> people
           </h3>
           <h3 className="text-3xl md:text-4xl lg:text-3xl xl:text-4xl 2xl:text-5xl">
-            <span className="font-semibold">
+            <span className="font-medium">
               {Math.round(100 * mostRecentHistoricalRecord.total.percent)}%
             </span>{' '}
             full
@@ -93,7 +93,7 @@ const LoadedLibraryComponent: React.FC<{
           >
             <div className="text-lg md:text-3xl lg:text-xl xl:text-2xl 2xl:text-3xl lg:px-1 xl:px-2">
               <span
-                className={`font-semibold ${nextHourPercentChange === undefined || nextHourPercentChange === 0 ? 'text-yellow-500' : nextHourPercentChange > 0 ? 'text-red-500' : 'text-green-500'}`}
+                className={`font-medium ${nextHourPercentChange === undefined || nextHourPercentChange === 0 ? 'text-yellow-500' : nextHourPercentChange > 0 ? 'text-red-500' : 'text-green-500'}`}
               >
                 {nextHourPercentChange === undefined || nextHourPercentChange === 0
                   ? 'no change'
@@ -107,7 +107,7 @@ const LoadedLibraryComponent: React.FC<{
           >
             <div className="text-lg md:text-3xl lg:text-xl xl:text-2xl 2xl:text-3xl lg:px-1 xl:px-2">
               <span
-                className={`font-semibold ${lastDayPercentChange === undefined || lastDayPercentChange === 0 ? 'text-yellow-500' : lastDayPercentChange > 0 ? 'text-red-500' : 'text-green-500'}`}
+                className={`font-medium ${lastDayPercentChange === undefined || lastDayPercentChange === 0 ? 'text-yellow-500' : lastDayPercentChange > 0 ? 'text-red-500' : 'text-green-500'}`}
               >
                 {lastDayPercentChange === undefined || lastDayPercentChange === 0
                   ? 'no change'
