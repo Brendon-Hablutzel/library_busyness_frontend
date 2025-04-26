@@ -5,24 +5,16 @@ import { capitalize, getNearestItemByFn, maxByFn, nDaysBefore, nHoursAfter } fro
 import { Toggle } from './Toggle'
 import { ForecastRecord, HistoricalRecord, Library } from '../utils/models'
 import { Link } from 'react-router-dom'
+import { DotPulse } from 'ldrs/react'
+import 'ldrs/react/DotPulse.css'
 
 // component for the main page to display while data is being fetched
 const LoadingLibraryComponent: React.FC = () => {
   return (
     <div className="flex gap-2 items-center text-2xl">
       <h2 className="">Loading data, please wait</h2>
-      <div className="flex">
-        <div className="justify-between gap-2 inline-flex">
-          <span className="block relative box-border animate-[grow-shrink_1s_ease-in-out_infinite_0ms]">
-            .
-          </span>
-          <span className="block relative box-border animate-[grow-shrink_1s_ease-in-out_infinite_200ms]">
-            .
-          </span>
-          <span className="block relative box-border animate-[grow-shrink_1s_ease-in-out_infinite_400ms]">
-            .
-          </span>
-        </div>
+      <div className="">
+        <DotPulse size="35" speed="1" color="#d4d4d4" />
       </div>
     </div>
   )
