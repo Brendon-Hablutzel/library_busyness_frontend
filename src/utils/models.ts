@@ -1,3 +1,5 @@
+// contains models used in UI components
+
 // possible libraries
 export type Library = 'hill' | 'hunt'
 

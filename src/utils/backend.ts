@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { ForecastRecord, HistoricalRecord, Library, LibraryMetrics, SummaryMetrics } from './models'
 
 // currently, each API endpoint is located at a different URL,
@@ -25,69 +26,89 @@ export enum ResponseStatus {
   LOADED = 'loaded',
 }
 
-// when fetching historical data from the backend, this is the body
-// that should be returned
-interface HistoricalBackendResponse<
-  T extends BackendHillHistoricalRecord | BackendHuntHistoricalRecord,
-> {
-  success?: boolean
-  busynessRecords?: T[]
+// when fetching historical or forecast data from the backend, this is the body
+const generateBackendResponse = <T extends z.ZodRawShape>(successSchema: T) => {
+  return z.discriminatedUnion('success', [
+    z.object({
+      success: z.literal(true),
+      ...successSchema,
+    }),
+    z.object({
+      success: z.literal(false),
+      message: z.string(),
+    }),
+  ])
 }
 
 // backend records--not to be used by any UI components
 
-interface BackendHillHistoricalRecord {
-  library: 'hill'
-  record_datetime: number
-  active: boolean
-  total_count: number
-  total_percent: number
-  east_count: number
-  east_percent: number
-  tower_count: number
-  tower_percent: number
-  west_count: number
-  west_percent: number
-}
+// these `*DataRecord`s are taken from the backend and must be kept in sync
 
-interface BackendHuntHistoricalRecord {
-  library: 'hunt'
-  record_datetime: number
-  active: boolean
-  total_count: number
-  total_percent: number
-  level2_count: number
-  level2_percent: number
-  level3_count: number
-  level3_percent: number
-  level4_count: number
-  level4_percent: number
-  level5_count: number
-  level5_percent: number
-}
+// note that the area count values may be null in the database, but the backend will transform
+// any null values into 0
+const HillDataRecord = z.object({
+  library: z.literal('hill'),
+  record_datetime: z.number(),
+  active: z.boolean(),
+  total_count: z.number(),
+  total_percent: z.number(),
+  east_count: z.number(),
+  east_percent: z.number(),
+  tower_count: z.number(),
+  tower_percent: z.number(),
+  west_count: z.number(),
+  west_percent: z.number(),
+})
 
-// when fetching forecast data from the backend, this is the body that
-// should be returned
-interface ForecastBackendResponse<T extends BackendHillForecastRecord | BackendHuntForecastRecord> {
-  success?: boolean
-  busynessForecastRecords?: T[]
-}
+const HuntDataRecord = z.object({
+  library: z.literal('hunt'),
+  record_datetime: z.number(),
+  active: z.boolean(),
+  total_count: z.number(),
+  total_percent: z.number(),
+  level2_count: z.number(),
+  level2_percent: z.number(),
+  level3_count: z.number(),
+  level3_percent: z.number(),
+  level4_count: z.number(),
+  level4_percent: z.number(),
+  level5_count: z.number(),
+  level5_percent: z.number(),
+})
+
+const HillHistoricalBackendResponse = generateBackendResponse({
+  busynessRecords: z.array(HillDataRecord),
+})
+
+const HuntHistoricalBackendResponse = generateBackendResponse({
+  busynessRecords: z.array(HuntDataRecord),
+})
 
 // backend records--not to be used in any UI components
 
-interface BackendHillForecastRecord {
-  library: 'hill#prediction'
-  record_datetime: number
-  total_count: number
-  total_percent: number
-}
+// these `*ForecastDataRecord`s are taken from the backend and must be kept in sync
 
-interface BackendHuntForecastRecord {
-  library: 'hunt#prediction'
-  record_datetime: number
-  total_count: number
-  total_percent: number
-}
+const HillForecastRecord = z.object({
+  library: z.literal('hill#prediction'),
+  record_datetime: z.number(),
+  total_count: z.number(),
+  total_percent: z.number(),
+})
+
+const HuntForecastRecord = z.object({
+  library: z.literal('hunt#prediction'),
+  record_datetime: z.number(),
+  total_count: z.number(),
+  total_percent: z.number(),
+})
+
+const HillForecastBackendResponse = generateBackendResponse({
+  busynessForecastRecords: z.array(HillForecastRecord),
+})
+
+const HuntForecastBackendResponse = generateBackendResponse({
+  busynessForecastRecords: z.array(HuntForecastRecord),
+})
 
 // busyness data that will be returned for use in components
 export type BusynessData =
@@ -108,11 +129,10 @@ export type BusynessData =
 export const fetchHillRecords = async (since: Date): Promise<BusynessData> => {
   try {
     const historicalResponse = await fetch(
-      `${getApiUrl()}/historical/hill?since=${since.getTime()}`
+      `${getApiUrl()}/historical/hill?since=${since.getTime()}`,
     )
-    // unchecked cast
-    const historicalBody =
-      (await historicalResponse.json()) as HistoricalBackendResponse<BackendHillHistoricalRecord>
+    const rawHistoricalData = await historicalResponse.json()
+    const historicalBody = HillHistoricalBackendResponse.parse(rawHistoricalData)
 
     if (!historicalBody.success) {
       throw new Error('server was unable to process the request for historical records')
@@ -146,11 +166,10 @@ export const fetchHillRecords = async (since: Date): Promise<BusynessData> => {
     })
 
     const forecastResponse = await fetch(
-      `${getApiUrl()}/forecast/hill?since=${new Date().getTime()}`
+      `${getApiUrl()}/forecast/hill?since=${new Date().getTime()}`,
     )
-    // unchecked cast
-    const forecastBody =
-      (await forecastResponse.json()) as ForecastBackendResponse<BackendHillForecastRecord>
+    const rawForecastData = await forecastResponse.json()
+    const forecastBody = HillForecastBackendResponse.parse(rawForecastData)
 
     if (!forecastBody.success) {
       throw new Error('server was unable to process the request for forecast records')
@@ -186,11 +205,10 @@ export const fetchHillRecords = async (since: Date): Promise<BusynessData> => {
 export const fetchHuntRecords = async (since: Date): Promise<BusynessData> => {
   try {
     const historicalResponse = await fetch(
-      `${getApiUrl()}/historical/hunt?since=${since.getTime()}`
+      `${getApiUrl()}/historical/hunt?since=${since.getTime()}`,
     )
-    // unchecked cast
-    const historicalBody =
-      (await historicalResponse.json()) as HistoricalBackendResponse<BackendHuntHistoricalRecord>
+    const rawHistoricalData = await historicalResponse.json()
+    const historicalBody = HuntHistoricalBackendResponse.parse(rawHistoricalData)
 
     if (!historicalBody.success) {
       throw new Error('server was unable to process the request for historical records')
@@ -226,11 +244,10 @@ export const fetchHuntRecords = async (since: Date): Promise<BusynessData> => {
     })
 
     const forecastResponse = await fetch(
-      `${getApiUrl()}/forecast/hunt?since=${new Date().getTime()}`
+      `${getApiUrl()}/forecast/hunt?since=${new Date().getTime()}`,
     )
-    // unchecked cast
-    const forecastBody =
-      (await forecastResponse.json()) as ForecastBackendResponse<BackendHuntForecastRecord>
+    const rawForecastData = await forecastResponse.json()
+    const forecastBody = HuntForecastBackendResponse.parse(rawForecastData)
 
     if (!forecastBody.success) {
       throw new Error('server was unable to process the request for forecast records')
