@@ -39,7 +39,7 @@ const LoadedLibraryComponent: React.FC<{
   const nextHourRecord = getNearestItemByFn(
     forecastRecords,
     (forecast) => forecast.record_datetime.valueOf(),
-    nHoursAfter(now, 1).valueOf()
+    nHoursAfter(now, 1).valueOf(),
   )
 
   const nextHourCount =
@@ -55,7 +55,7 @@ const LoadedLibraryComponent: React.FC<{
   const dayAgoRecord = getNearestItemByFn(
     historicalRecords,
     (record) => record.record_datetime.valueOf(),
-    nDaysBefore(now, 1).valueOf()
+    nDaysBefore(now, 1).valueOf(),
   )
 
   const dayAgoCount = dayAgoRecord !== undefined ? dayAgoRecord.total.count : undefined
@@ -164,7 +164,7 @@ const LibraryComponent: React.FC<{
       const { historicalRecords, forecastRecords } = data
 
       const mostRecentHistoricalRecord = maxByFn(historicalRecords, (record) =>
-        record.record_datetime.valueOf()
+        record.record_datetime.valueOf(),
       )
 
       if (historicalRecords.length === 0 || mostRecentHistoricalRecord === undefined) {
@@ -213,7 +213,7 @@ const Home: React.FC = () => {
         setNow(new Date())
       },
       // every 5 minutes
-      1000 * 60 * 5
+      1000 * 60 * 5,
     )
 
     return () => clearInterval(interval)

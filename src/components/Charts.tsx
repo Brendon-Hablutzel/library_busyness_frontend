@@ -122,7 +122,7 @@ export const BusynessAreaChart: React.FC<BusynessAreaChartProps> = ({
     // this will be set once when the page loads, and then whenever the
     // data is re-fetched in the background
     window.innerWidth / MIN_DATAPOINT_WIDTH,
-    historicalRecords.length
+    historicalRecords.length,
   )
 
   const selectedHistoricalRecords = historicalRecords.slice(-numSelectedHistoricalRecords)
