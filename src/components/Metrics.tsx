@@ -3,6 +3,7 @@ import { fetchMetrics, MetricsData, ResponseStatus } from '../utils/backend'
 import { capitalize, nWeeksBefore } from '../utils'
 import { ForecastMetricsChart } from './Charts'
 import { LibraryMetrics } from '../utils/models'
+import { DotPulse } from 'ldrs/react'
 
 // the number of prior weeks to show metrics for
 const METRICS_PRIOR_WEEKS = 4
@@ -13,18 +14,8 @@ const LoadingMetricsComponent: React.FC = () => {
     <div className="flex justify-center">
       <div className="flex gap-2 items-center text-2xl">
         <h2 className="">Loading data, please wait</h2>
-        <div className="flex">
-          <div className="justify-between gap-2 inline-flex">
-            <span className="block relative box-border animate-[grow-shrink_1.5s_ease-in-out_infinite_0ms]">
-              .
-            </span>
-            <span className="block relative box-border animate-[grow-shrink_1.5s_ease-in-out_infinite_200ms]">
-              .
-            </span>
-            <span className="block relative box-border animate-[grow-shrink_1.5s_ease-in-out_infinite_400ms]">
-              .
-            </span>
-          </div>
+        <div>
+          <DotPulse size="35" speed="1" color="#d4d4d4" />
         </div>
       </div>
     </div>
@@ -106,7 +97,9 @@ export const Metrics: React.FC = () => {
     case ResponseStatus.ERROR:
       console.error(metricsResponse.error)
 
-      component = <div className="text-center">Error loading metrics, please try again</div>
+      component = (
+        <div className="text-center text-2xl">Error loading metrics, please try again</div>
+      )
       break
     case ResponseStatus.LOADED:
       component = (
@@ -130,11 +123,6 @@ export const Metrics: React.FC = () => {
             NC State Library Busyness Metrics
           </h1>
         </div>
-        {/* <div className="flex justify-center items-center">
-          <h1 className="font-bold filter drop-shadow-header text-xl sm:text-2xl md:text-3xl lg:text-3xl xl:text-3xl 2xl:text-4xl text-center">
-            Forecast Metrics
-          </h1>
-        </div> */}
         {component}
       </div>
     </div>

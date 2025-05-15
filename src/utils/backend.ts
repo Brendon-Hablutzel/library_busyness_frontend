@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { ForecastRecord, HistoricalRecord, Library, LibraryMetrics, SummaryMetrics } from './models'
+import { ForecastRecord, HistoricalRecord, LibraryMetrics } from './models'
 
 // currently, each API endpoint is located at a different URL,
 // and these URLs can be configured via environment variables.
@@ -26,7 +26,7 @@ export enum ResponseStatus {
   LOADED = 'loaded',
 }
 
-// when fetching historical or forecast data from the backend, this is the body
+// when fetching historical, forecast, or metrics data from the backend, this is the body
 const generateBackendResponse = <T extends z.ZodRawShape>(successSchema: T) => {
   return z.discriminatedUnion('success', [
     z.object({
@@ -194,6 +194,7 @@ export const fetchHillRecords = async (since: Date): Promise<BusynessData> => {
       forecastRecords,
     }
   } catch (e) {
+    console.error(e)
     return {
       status: ResponseStatus.ERROR,
       error: e,
@@ -270,6 +271,7 @@ export const fetchHuntRecords = async (since: Date): Promise<BusynessData> => {
       forecastRecords,
     }
   } catch (e) {
+    console.error(e)
     return {
       status: ResponseStatus.ERROR,
       error: e,
@@ -278,21 +280,30 @@ export const fetchHuntRecords = async (since: Date): Promise<BusynessData> => {
 }
 
 // when fetching metrics data from the backend, this is what should
-// be returned (NOTE: includes all libraries). this should be used by
+// be returned (NOTE: includes all libraries). this should be not used by
 // any UI component
-interface MetricsBackendResponse {
-  success?: boolean
-  metrics?: {
-    library: Library
-    records: {
-      total_count_actual: number
-      total_count_predicted: number
-      record_datetime: number
-    }[]
-    overall: SummaryMetrics
-    daytime: SummaryMetrics
-  }[]
-}
+const BasicMetrics = z.object({
+  numForecastRecords: z.number(),
+  averagePercentError: z.number(),
+  meanAbsoluteError: z.number(),
+})
+
+const LibraryForecastMetrics = z.object({
+  library: z.enum(['hill', 'hunt']),
+  overall: BasicMetrics,
+  daytime: BasicMetrics,
+  records: z.array(
+    z.object({
+      record_datetime: z.number(),
+      total_count_actual: z.number(),
+      total_count_predicted: z.number(),
+    }),
+  ),
+})
+
+const MetricsBackendResponse = generateBackendResponse({
+  metrics: z.array(LibraryForecastMetrics),
+})
 
 // metrics data that will be returned for use in components
 export type MetricsData =
@@ -312,8 +323,9 @@ export type MetricsData =
 export const fetchMetrics = async (since: Date): Promise<MetricsData> => {
   try {
     const metricsResponse = await fetch(`${getApiUrl()}/metrics?since=${since.getTime()}`)
+    const rawMetricsData = await metricsResponse.json()
+    const metricsBody = MetricsBackendResponse.parse(rawMetricsData)
     // unchecked cast
-    const metricsBody = (await metricsResponse.json()) as MetricsBackendResponse
 
     if (!metricsBody.success || metricsBody.metrics === undefined) {
       throw new Error('server was unable to process the request for metrics')
@@ -344,6 +356,7 @@ export const fetchMetrics = async (since: Date): Promise<MetricsData> => {
       metrics,
     }
   } catch (e) {
+    console.error(e)
     return {
       status: ResponseStatus.ERROR,
       error: e,

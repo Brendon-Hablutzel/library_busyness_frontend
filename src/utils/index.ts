@@ -66,7 +66,7 @@ export const capitalize = (s: string) => {
 export const getNearestItemByFn = <T>(
   arr: T[],
   fn: (item: T) => number,
-  target: number
+  target: number,
 ): T | undefined => {
   let found: T | undefined
   let diff: number | undefined
