@@ -13,7 +13,7 @@
     "check": "npx prettier --check ."
   },
   "dependencies": {
-    "@typescript-eslint/parser": "^8.31.1",
+    "@typescript-eslint/parser": "^8.32.1",
     "ldrs": "^1.1.7",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
