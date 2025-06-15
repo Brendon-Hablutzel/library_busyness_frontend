@@ -19,12 +19,12 @@
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.1",
     "recharts": "^2.12.7",
-    "zod": "^3.24.4"
+    "zod": "^3.25.46"
   },
   "devDependencies": {
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.5",
-    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/eslint-plugin": "^8.33.0",
     "@vitejs/plugin-react": "^4.5.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.28.0",
